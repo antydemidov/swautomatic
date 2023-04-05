@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "common_path": { "type": "string" },
+    "appid": { "type": "number" },
+    "app_path": { "type": "string" },
+    "database_name": { "type": "string" },
+    "user_url_profiles": { "type": "string" },
+    "user_url_id": { "type": "string" },
+    "asset_url": { "type": "string" },
+    "user_favs_url": { "type": "string" },
+    "links_file_path": { "type": "string" },
+    "previews_path": { "type": "string" },
+    "steam_api_url": { "type": "string" },
+    "needed_fields": { "type": "array" }
+  }
+}

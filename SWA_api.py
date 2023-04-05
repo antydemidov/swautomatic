@@ -1,25 +1,26 @@
 import os
 import re
 import shutil
-import typing
+# import typing
 import zipfile
 from dataclasses import dataclass
 from datetime import datetime
+from pymongo import MongoClient
 
 import requests as rq
 from bs4 import BeautifulSoup as bs
 
-from connection import Connection
+# from connection import Connection
 from results import CommonResult
 from settings import SWASettings
 from utils import get_author_data
 
-__version__ = '2023.01.23'
 __author__ = 'Anton Demidov | @antydemidov'
 
-settings = SWASettings().load().validate()
-db = Connection(settings.database_name)
-tags_coll, assets_coll = db.get_coll('tags'), db.get_coll('assets')
+settings = SWASettings()
+client = MongoClient(settings.uri)
+db = client.get_database(settings.database_name)
+assets_coll, tags_coll = db.get_collection('assets'), db.get_collection('tags')
 
 url_parts = ['cw03361255710','cw85745255710','ca40929255710','ci03361255710']
 base_links = [f'https://cdn.ggntw.com/{i}/' for i in url_parts] + [
@@ -178,21 +179,21 @@ class SWAObject:
             info = {}
             steamid = int(key)
             info_from_steam = value
-            if info_from_steam.get('publishedfileid') == None:
+            if info_from_steam.get('publishedfileid') is None:
                 info = None
             else:
                 info.update({'steamid': steamid})
 
                 # name
                 asset_name = info_from_steam.get('title')
-                if asset_name != None:
+                if asset_name is not None:
                     info.update({'name': asset_name})
                 else:
                     info.update({'name': None})
 
                 # tags
                 workshop_tags = info_from_steam['tags']
-                if workshop_tags != None:
+                if workshop_tags is not None:
                     tags = []
                     for workshop_tag in workshop_tags:
                         tags.append(tags_coll.find_one({'tag': workshop_tag['tag']})['_id'])
@@ -223,10 +224,10 @@ class SWAObject:
                 info.update({'path': path})
 
                 # is_installed
-                info.update({'is_installed': self.is_installed()})
+                info.update({'is_installed': self.is_installed(steamid)})
 
                 # time_local
-                if info['is_installed'] == True:
+                if info['is_installed'] is True:
                     time_local = datetime.fromtimestamp(os.path.getmtime(info['path']))
                 else:
                     time_local = None
@@ -245,12 +246,13 @@ class SWAObject:
         return data
 
     def update_database(self):
-        ids = self.get_ids_from_steam_favs()
-        ids_in_db = [id['steamid'] for id in list(assets_coll.find({}, projection={'_id': False, 'steamid': True}))]
+        ids_favs = self.get_ids_from_steam_favs().ids
+        ids_in_db = [id['steamid'] for id in list(assets_coll.find(
+            {}, projection={'_id': False, 'steamid': True}))]
 
-        if ids.status_bool == True:
-            ids_to_delete = list(set(ids_in_db) - set(ids.ids))
-            ids_to_update = list(set(ids.ids) - set(ids_in_db))
+        if ids_favs.status_bool is True:
+            ids_to_delete = list(set(ids_in_db) - set(ids_favs))
+            ids_to_update = list(set(ids_favs) - set(ids_in_db))
             if ids_to_delete:
                 deleted_count = assets_coll.delete_many(
                     {'steamid': {'$in': ids_to_delete}}
@@ -285,21 +287,21 @@ class Asset:
     def get_stats_from_steam(self):
         info = {}
         info_from_steam = self.swa_object.steam_api_data(self.id)[str(self.id)]
-        if info_from_steam.get('publishedfileid') == None:
+        if info_from_steam.get('publishedfileid') is None:
             self.info = None
             return None
         info.update({'steamid': self.id})
 
         # name
         asset_name = info_from_steam.get('title')
-        if asset_name == None:
+        if asset_name is None:
             info.update({'name': None})
         else:
             info.update({'name': asset_name})
 
         # tags
         workshop_tags = info_from_steam.get('tags')
-        if workshop_tags != None:
+        if workshop_tags is not None:
             tags = []
             for workshop_tag in workshop_tags:
                 tags.append(tags_coll.find_one({'tag': workshop_tag['tag']})['_id'])
@@ -333,7 +335,7 @@ class Asset:
         info.update({'is_installed': self.is_installed()})
 
         # my date of update
-        if info['is_installed'] == True:
+        if info['is_installed'] is True:
             time_local = datetime.fromtimestamp(os.path.getmtime(info['path']))
         else:
             time_local = None
@@ -354,18 +356,18 @@ class Asset:
 
     def get_stats(self):
         info = self.get_stats_from_db()
-        if info == None:
+        if info is None:
             info = self.get_stats_from_steam()
         self.info = info
-        status = (info != None)
+        status = (info is not None)
         return status
 
     def download_preview(self):
-        if self.info == None:
+        if self.info is None:
             self.get_stats()
         if not os.path.exists(self.info.preview_path):
             preview_url = self.info.preview_url
-            if preview_url != None:
+            if preview_url is not None:
                 with rq.get(preview_url) as req:
                     preview_b = req.content
                 path = self.info.preview_path
@@ -380,11 +382,11 @@ class Asset:
     def update_stats_full(self):
         info_from_steam = self.get_stats_from_steam() # TODO: Доработать обработку dAsset
         info_from_db = self.get_stats_from_db() # TODO: Доработать обработку dAsset
-        if (info_from_db == None and info_from_steam == False):
+        if (info_from_db is None and info_from_steam is False):
             return ValueError
-        elif info_from_db == None:
+        elif info_from_db is None:
             assets_coll.insert_one(info_from_steam) # FIXME:
-        elif info_from_steam != info_from_db:
+        elif info_from_steam is not info_from_db:
             set_info_from_steam = info_from_steam.items() # FIXME:
             set_info_from_db = info_from_db.items() # FIXME:
             diff = set_info_from_steam - set_info_from_db
@@ -392,7 +394,7 @@ class Asset:
                 assets_coll.update_one({'steamid': self.id}, {'$set': dict(diff)})
 
     def update_preview_path(self):
-        if self.info == None: self.get_stats()
+        if self.info is None: self.get_stats()
         try:
             preview_url = self.info.preview_url
             with rq.head(preview_url) as req:
@@ -408,7 +410,7 @@ class Asset:
 
     def update_preview_url(self):
         info = self.get_stats_from_steam()
-        if info != None:
+        if info is not None:
             assets_coll.update_one(
                 {'steamid': self.id},
                 {'$set': {'preview_url': info['preview_url']}}
@@ -419,9 +421,9 @@ class Asset:
         return dAsset(**data)
 
     def download(self) -> bool:
-        if self.info == None:
+        if self.info is None:
             self.get_stats()
-        if (self.info.is_installed == False or self.info.need_update == True):
+        if (self.info.is_installed is False or self.info.need_update is True):
             path = f'{self.info.path}.zip'
             for base_link in base_links:
                 url = base_link + str(self.id) + '.zip'
@@ -452,7 +454,7 @@ class Asset:
         else:
             status = True
 
-        if status == True:
+        if status is True:
             assets_coll.update_one(
                 {'steamid': self.id},
                 {'$set': {
@@ -490,7 +492,7 @@ class Asset:
 
 class ContentType:
     def __init__(self, string: str):
-        if string == None:
+        if string is None:
             raise ValueError(string)
         self.string = string
         other = []
@@ -502,7 +504,7 @@ class ContentType:
         params = {}
         while i in range(len(other)):
             params.update({other[i]: other[i+1]})
-            self.__setattr__(other[i], other[i+1])
+            setattr(self, other[i], other[i+1])
             i += 2
         self.params = params
 
@@ -561,14 +563,14 @@ class dAsset:
             if key == 'author':
                 self.author = dAuthor(**value)
             elif key == 'tags':
-                if type(value) == list:
+                if isinstance(value, list):
                     self.tags = [dTag(tag) for tag in value]
                 else:
                     self.tags = [dTag(value)]
             elif key == 'preview_url':
                 self.preview_url = dPreview(value, self.steamid)
             else:
-                self.__setattr__(key, value)
+                setattr(self, key, value)
 
     def to_dict(self):
         result = {}

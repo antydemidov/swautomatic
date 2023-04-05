@@ -8,7 +8,7 @@ from settings import SWASettings
 from SWA_api import Asset, SWAObject
 
 swa_object = SWAObject()
-settings = SWASettings().load().validate()
+settings = SWASettings()
 db = Connection(settings.database_name)
 assets_db = db.get_coll('assets')
 tags_db = db.get_coll('tags')

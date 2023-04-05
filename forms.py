@@ -5,7 +5,7 @@ from wtforms.validators import InputRequired
 from settings import SWASettings
 from connection import Connection
 
-settings = SWASettings().load().validate()
+settings = SWASettings()
 
 tags = [tag['tag'] for tag in Connection(settings.database_name).get_coll('tags').find({})]
 
