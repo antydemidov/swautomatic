@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script>
+    function hide_show() {
+        var div = document.getElementById("loader").style.display;
+        if (div == "") div = "none";
+        if (div == "none") { div = "block"; } else { div = "none"; }
+        document.getElementById("loader").style.display=div;
+    }
+</script>
+
+<div class="loader" id="loader">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+        <animateTransform attributeName="transform" dur="2s" type="rotate" from="0" to="360"
+            repeatCount="indefinite"/>
+    </svg>
+</div>
+
+<div class="library_page_head shadow">
+    <img src="{{ asset_details['preview_path'] }}">
+    <h1>{{ asset_details['name'] }}</h1>
+</div>
+
+<div class="library_page_underhead shadow">
+    <form class="library_page_toolbar" method="post">
+        {% if asset_details['need_update'] == True %}
+        <button name="download_asset" value="true" type="submit" download_title="Download asset" formmethod="post" onClick="hide_show();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-refresh-cw">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
+        {% elif asset_details['is_installed'] == True %}
+        <button name="downloaded_asset" value="False" type="button" style="cursor:not-allowed"
+            download_title="Asset is downloaded">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-check">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </button>
+        {% else %}
+        <button name="download_asset" value="true" type="submit" download_title="Download asset" formmethod="post" onClick="hide_show();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-download"
+                viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="M7 10L12 15 17 10" />
+                <path d="M12 15L12 3" />
+            </svg>
+        </button>
+        {% endif %}
+    </form>
+    <div class="library_page_author">
+        <img src="{{ asset_details['author']['avatarIcon'] }}">
+        <p>{{ asset_details['author']['steamID'] }}</p>
+    </div>
+</div>
+<table class="library_page_table shadow">
+    <tr>
+        <th>Steam ID</th>
+        <td>{{ asset_details['steamid'] }}</td>
+    </tr>
+    <tr>
+        <th>Tags</th>
+        <td>
+            {% for tag in asset_details['tags'] %}
+            <a href={{ url_for('library', tag=tag) }}>{{ tag }}</a>
+            {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        <th>File size</th>
+        <td>{{ asset_details['file_size'] }} MB</td>
+    </tr>
+    <tr>
+        <th>Time created</th>
+        <td>{{ asset_details['time_created'] }}</td>
+    </tr>
+    <tr>
+        <th>Time updated</th>
+        <td>{{ asset_details['time_updated'] }}</td>
+    </tr>
+</table>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>{{ heading }}</h1>
+<p>{{ content }}</p>
+<p>{{ path }}</p>
+
+<form action="" method="post">
+    {{ form.common_path }}
+    <input type="file" webkitdirectory directory multiple/>
+    {{ form.settings_submit }}
+    {{ form.hidden_tag() }}
+</form>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{
+    "authmechanism": "DEFAULT",
+    "authsource": "admin",
+    "appid": 255710,
+    "database_name": "CSws",
+    "app_path": "",
+    "common_path": "E:/Games/Cities Skylines/Files",
+    "user_url_profiles": "https://steamcommunity.com/profiles/",
+    "user_url_id": "https://steamcommunity.com/id/",
+    "asset_url": "https://steamcommunity.com/sharedfiles/filedetails/",
+    "user_favs_url": "https://steamcommunity.com/id/antydemidov/myworkshopfiles",
+    "links_file_path": "links.txt",
+    "previews_path": "previews",
+    "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1",
+    "needed_fields": [
+        "creator",
+        "file_size",
+        "preview_url",
+        "publishedfileid",
+        "tags",
+        "time_created",
+        "time_updated",
+        "title"
+    ]
+}

@@ -1,0 +1,182 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script>
+    function hide_show() {
+        var div = document.getElementById("library_tags").style.display;
+        if (div == "") div = "none";
+        if (div == "none") { div = "block"; } else { div = "none"; }
+        document.getElementById("library_tags").style.display = div;
+    }
+
+    function hide_show_loader() {
+        var div = document.getElementById("loader").style.display;
+        if (div == "") div = "none";
+        if (div == "none") { div = "block"; } else { div = "none"; }
+        document.getElementById("loader").style.display=div;
+    }
+</script>
+
+<div class="loader" id="loader">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round" class="feather feather-loader">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+        <animateTransform attributeName="transform" dur="2s" type="rotate" from="0" to="360" repeatCount="indefinite" />
+    </svg>
+</div>
+
+<form class="library_filters shadow" id="library_filters" name="library_filters" action="{{ url_for('library') }}" method="post">
+    <fieldset>
+        <label><input type="radio" name="library_filters_choices" value="1">Need update</label>
+        <label><input type="radio" name="library_filters_choices" value="2">Installed</label>
+        <label><input type="radio" name="library_filters_choices" value="3">Not installed</label>
+    </fieldset>
+    <button class="library_toolbar_item" type="submit" name="filter" form="library_filters">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-check">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </button>
+</form>
+
+<div class="library_card_collection">
+    {% for asset in datalist %}
+    <a class="library_card shadow" href="{{ url_for('library_page', id = asset['id']) }}">
+        <img src="{{ asset['preview_path'] }}">
+        <p>{{ asset['name'] }}</p>
+        <div class="library_card_status" style="{{ asset['style'] }}" hover_title="{{ asset['hover_title'] }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+    </a>
+    <div class="library_card_details shadow">
+        <p><b>{{ asset['name'] }}</b></p>
+        <p><b>File size: </b>{{ asset['file_size'] }}</p>
+        <div class="library_card_details_author">
+            <p><b>Author:</b></p>
+            <img src="{{ asset['author_avatarIcon'] }}">
+            <p>{{ asset['author_steamID'] }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<form class="library_toolbar" method="post">
+    <button class="library_toolbar_item" type="submit" name="update" value="true" formmethod="post"
+        onclick="hide_show_loader();" hover-content="Update status of all assets">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+    </button>
+
+    <button class="library_toolbar_item" type="button" name="open_tag" onClick="hide_show();"
+        hover-content="Open tags list">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+    </button>
+
+    <button class="library_toolbar_item" type="submit" name="download_all" value="true" formmethod="post"
+        onclick="hide_show_loader();" hover-content="Download all assets">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-download"
+            viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <path d="M7 10L12 15 17 10" />
+            <path d="M12 15L12 3" />
+        </svg>
+    </button>
+
+    <button class="library_toolbar_item" type="submit" value="{{ no_show_need_upd }}" name="show_need_upd" action={{
+        url_for('library', tag=selected_tag, p=page_num, pp=per_page, show_need_upd=no_show_need_upd) }} hover-content="Show need update">
+        {% if show_need_upd %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-toggle-right">
+            <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
+            <circle cx="16" cy="12" r="3" fill="currentColor"></circle>
+        </svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-toggle-left">
+            <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
+            <circle cx="8" cy="12" r="3" fill="currentColor"></circle>
+        </svg>
+        {% endif %}
+    </button>
+</form>
+
+<div id="library_tags" class="library_tags shadow">
+    <form class="tag_search" id="library_tags_search" method="POST" action={{ url_for('library', tag=selected_tag,
+        pp=per_page, show_need_upd=show_need_upd) }}>
+        <div class="tag_search_icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-search">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+        <input name="tag" list="tags" id="tag_search" form="library_tags_search" formmethod="post">
+        <datalist id="tags">
+            {% for tag in tags %}
+            <option value="{{tag}}">
+            {% endfor %}
+        </datalist>
+        <input value="Search" type="submit" id="tag_search_submit" form="library_tags_search" formmethod="post">
+    </form>
+    <form id="library_tags_choice" method="POST">
+        {{ tags_form.tag_choices }}
+        <button name="select_tag" value="true" type="submit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-check">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </button>
+    </form>
+</div>
+
+<div class="paginator">
+    {% if page_num == 1 %}
+    <div class="paginator-item">{{ page_num }}</div>
+    {% if last_page > 2 %}
+    <a class="paginator-item" href={{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num+1}}</a>
+    <div class="paginator-gap"></div>
+    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    {% else %}
+    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    {% endif %}
+    {% elif page_num == last_page %}
+    <a class="paginator-item" href={{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num-1}}</a>
+    <div class="paginator-item">{{ page_num }}</div>
+    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    {% else %}
+    <a class="paginator-item" href={{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num-1}}</a>
+    <div class="paginator-item">{{ page_num }}</div>
+    <a class="paginator-item" href={{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num+1}}</a>
+    <div class="paginator-gap"></div>
+    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    {% endif %}
+</div>
+
+{% endblock %}
