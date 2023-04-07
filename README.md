@@ -13,8 +13,8 @@ mongosh
 use admin
 db.createUser(
   {
-    user: "siteUserAdmin",
-    pwd: "password",
+    user: "<MONGO_USERNAME>",
+    pwd: "<MONGO_PASSWORD>",
     roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
   }
 )
