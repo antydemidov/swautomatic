@@ -46,6 +46,7 @@ class SWASettings:
     - `needed_fields`: a list of strings representing the fields that are required for a document.
     - `uri`: a string representing the connection URI for the MongoDB database.
     - `timeout`: a float representing the number of seconds to wait for a request. This is set to 0 by default.
+    - `longtimeout`: a float representing the number of seconds to wait for a request. This is set to 0 by default.
     
     Methods:
     --------
@@ -71,6 +72,7 @@ class SWASettings:
         self.steam_api_url: str = ''
         self.needed_fields: list = []
         self.timeout: float = 0.0
+        self.longtimeout: float = 0.0
 
         try:
             with open('settings.json', 'r', encoding=UTF8) as file:

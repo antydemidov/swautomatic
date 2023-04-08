@@ -22,5 +22,6 @@
         "time_updated",
         "title"
     ],
-    "timeout": 15.0
+    "timeout": 15.0,
+    "longtimeout": 60.0
 }
