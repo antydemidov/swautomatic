@@ -1,13 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import FileField, RadioField, SubmitField
 from wtforms.validators import InputRequired
+from connection import tags_coll
 
-from settings import SWASettings
-from connection import Connection
-
-settings = SWASettings()
-
-tags = [tag['tag'] for tag in Connection(settings.database_name).get_coll('tags').find({})]
+tags = tags_coll.find({})
+tags_names = [tag['tag'] for tag in tags]
 
 
 class TagsForm(FlaskForm):

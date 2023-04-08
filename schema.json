@@ -12,6 +12,7 @@
     "links_file_path": { "type": "string" },
     "previews_path": { "type": "string" },
     "steam_api_url": { "type": "string" },
-    "needed_fields": { "type": "array" }
+    "needed_fields": { "type": "array" },
+    "timeout": { "type": "number"}
   }
 }
