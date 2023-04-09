@@ -6,7 +6,7 @@ Current Version: v0.1
 - [Steam Workshop Automatic](#steam-workshop-automatic)
 - [License](#license)
 - [Objects](#objects)
-  - [class `Asset`](#class-asset)
+  - [class `SWAAsset`](#class-swaasset)
 
 
 # License
@@ -14,11 +14,11 @@ MIT License
 
 # Objects
 
-## class `Asset`
+## class `SWAAsset`
 
-The code defines a class called `Asset`. It seems to be part of a larger project (maybe a game) and it is not clear from this code what exactly the purpose of the `Asset` class is.
+The code defines a class called `SWAAsset`. It seems to be part of a larger project (maybe a game) and it is not clear from this code what exactly the purpose of the `SWAAsset` class is.
 
-The class has an `__init__` method that sets several instance attributes based on the arguments passed. There is also a `from_source` class method that seems to allow for the creation of an instance of the `Asset` class from a dictionary of keyword arguments.
+The class has an `__init__` method that sets several instance attributes based on the arguments passed. There is also a `from_source` class method that seems to allow for the creation of an instance of the `SWAAsset` class from a dictionary of keyword arguments.
 
 The `to_dict` method returns a dictionary representation of the instance.
 
