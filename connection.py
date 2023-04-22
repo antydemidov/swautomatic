@@ -1,6 +1,4 @@
-"""
-Let you connect to MongoDB databases of BoD project
-"""
+"""Let you connect to MongoDB databases of BoD project"""
 
 from pymongo import MongoClient
 

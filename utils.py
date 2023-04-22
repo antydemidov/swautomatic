@@ -46,8 +46,8 @@ class WalkTree:
         '''recursively descend the directory tree rooted at top,
         calling the callback function for each regular file'''
 
-        for f in os.listdir(top):
-            pathname = os.path.realpath(os.path.join(top, f))
+        for file in os.listdir(top):
+            pathname = os.path.realpath(os.path.join(top, file))
             mode = os.lstat(pathname).st_mode
             if S_ISDIR(mode):
                 self._walktree(pathname)
@@ -68,7 +68,7 @@ class WalkTree:
                     'mtime': stat.st_mtime,
                 }
             })
-        return data if data != {} else None
+        return data if data else None
 
     def get_size(self) -> int:
         size = 0

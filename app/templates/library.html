@@ -13,7 +13,7 @@
         var div = document.getElementById("loader").style.display;
         if (div == "") div = "none";
         if (div == "none") { div = "block"; } else { div = "none"; }
-        document.getElementById("loader").style.display=div;
+        document.getElementById("loader").style.display = div;
     }
 </script>
 
@@ -33,12 +33,13 @@
     </svg>
 </div>
 
-<form class="library_filters shadow" id="library_filters" name="library_filters" action="{{ url_for('library') }}" method="post">
+<form class="library_filters shadow" id="library_filters" name="library_filters" action="{{ url_for('library') }}"
+    method="post">
     <fieldset>
-        <label><input type="radio" name="library_filters_choices" value="1">Need update</label>
         <label><input type="radio" name="library_filters_choices" value="2">Installed</label>
         <label><input type="radio" name="library_filters_choices" value="3">Not installed</label>
     </fieldset>
+    {{ per_page_form.per_page_selector }}
     <button class="library_toolbar_item" type="submit" name="filter" form="library_filters">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -54,8 +55,9 @@
         <img src="{{ asset['preview_path'] }}">
         <p>{{ asset['name'] }}</p>
         <div class="library_card_status" style="{{ asset['style'] }}" hover_title="{{ asset['hover_title'] }}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-check">
                 <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
         </div>
@@ -73,10 +75,11 @@
 </div>
 
 <form class="library_toolbar" method="post">
-    <button class="library_toolbar_item" type="submit" name="update" value="true" formmethod="post"
+    <button class="library_toolbar_item" type="submit" name="update_database" value="true" formmethod="post"
         onclick="hide_show_loader();" hover-content="Update status of all assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-refresh-cw">
             <polyline points="23 4 23 10 17 10"></polyline>
             <polyline points="1 20 1 14 7 14"></polyline>
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -85,8 +88,9 @@
 
     <button class="library_toolbar_item" type="button" name="open_tag" onClick="hide_show();"
         hover-content="Open tags list">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-list">
             <line x1="8" y1="6" x2="21" y2="6"></line>
             <line x1="8" y1="12" x2="21" y2="12"></line>
             <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -107,17 +111,20 @@
         </svg>
     </button>
 
-    <button class="library_toolbar_item" type="submit" value="{{ no_show_need_upd }}" name="show_need_upd" action={{
-        url_for('library', tag=selected_tag, p=page_num, pp=per_page, show_need_upd=no_show_need_upd) }} hover-content="Show need update">
+    <button class="library_toolbar_item" type="submit" value="{{ no_show_need_upd }}" name="show_need_upd" action="{{
+        url_for('library', tag=selected_tag, p=page_num, pp=per_page, show_need_upd=no_show_need_upd) }}"
+        hover-content="Show need update">
         {% if show_need_upd %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-toggle-right">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-toggle-right">
             <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
             <circle cx="16" cy="12" r="3" fill="currentColor"></circle>
         </svg>
         {% else %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-toggle-left">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-toggle-left">
             <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
             <circle cx="8" cy="12" r="3" fill="currentColor"></circle>
         </svg>
@@ -126,8 +133,8 @@
 </form>
 
 <div id="library_tags" class="library_tags shadow">
-    <form class="tag_search" id="library_tags_search" method="POST" action={{ url_for('library', tag=selected_tag,
-        pp=per_page, show_need_upd=show_need_upd) }}>
+    <form class="tag_search" id="library_tags_search" method="POST" action="{{ url_for('library', tag=selected_tag,
+        pp=per_page, show_need_upd=show_need_upd) }}">
         <div class="tag_search_icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -140,7 +147,7 @@
         <datalist id="tags">
             {% for tag in tags %}
             <option value="{{tag}}">
-            {% endfor %}
+                {% endfor %}
         </datalist>
         <input value="Search" type="submit" id="tag_search_submit" form="library_tags_search" formmethod="post">
     </form>
@@ -160,22 +167,30 @@
     {% if page_num == 1 %}
     <div class="paginator-item">{{ page_num }}</div>
     {% if last_page > 2 %}
-    <a class="paginator-item" href={{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num+1}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num+1}}</a>
     <div class="paginator-gap"></div>
-    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
     {% else %}
-    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
     {% endif %}
     {% elif page_num == last_page %}
-    <a class="paginator-item" href={{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num-1}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num-1}}</a>
     <div class="paginator-item">{{ page_num }}</div>
-    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
     {% else %}
-    <a class="paginator-item" href={{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num-1}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num-1}}</a>
     <div class="paginator-item">{{ page_num }}</div>
-    <a class="paginator-item" href={{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}>{{page_num+1}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num+1}}</a>
     <div class="paginator-gap"></div>
-    <a class="paginator-item" href={{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}>{{last_page}}</a>
+    <a class="paginator-item"
+        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
     {% endif %}
 </div>
 

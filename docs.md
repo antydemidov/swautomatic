@@ -3,18 +3,68 @@
 Current Version: v0.1
 
 **Table of Contents**
+
 - [Steam Workshop Automatic](#steam-workshop-automatic)
-- [License](#license)
-- [Objects](#objects)
-  - [class `SWAAsset`](#class-swaasset)
+  - [License](#license)
+  - [Installation](#installation)
+  - [Objects](#objects)
+    - [Class `SWAObject`](#class-swaobject)
+    - [Class `SWAAsset`](#class-swaasset)
 
+## License
 
-# License
 MIT License
 
-# Objects
+## Installation
 
-## class `SWAAsset`
+1. Устанавливаем MongoDB community edition
+2. Заходим в `mongosh`
+
+```powershell
+mongosh
+```
+
+3. Выписываем себе пользователя `admin` и записываем `MONGO_USERNAME`, `MONGO_PASSWORD` в `.env` файл (пример лежит в `.env.example`)
+
+```mongosh
+use admin
+db.createUser(
+  {
+    user: "<MONGO_USERNAME>",
+    pwd: "<MONGO_PASSWORD>",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+  }
+)
+```
+
+4. Создаем базу
+
+```mongosh
+use CSws
+```
+
+5. Создаем коллекции `assets` и `tags`
+
+```mongosh
+db.createCollection("assets")
+db.createCollection("tags")
+```
+
+6. Запускаем flask
+
+```powershell
+python3 run.py
+```
+
+И переходим по адресу <http://127.0.0.1:5000>
+
+## Objects
+
+### Class `SWAObject`
+
+Description
+
+### Class `SWAAsset`
 
 The code defines a class called `SWAAsset`. It seems to be part of a larger project (maybe a game) and it is not clear from this code what exactly the purpose of the `SWAAsset` class is.
 

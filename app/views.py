@@ -1,8 +1,8 @@
-""""""
+"""Here must be the string"""
 from flask import render_template, request, send_from_directory, url_for
 from app import app
 from connection import assets_coll, tags_coll#, client, settings,
-from forms import SettingsForm, TagsForm
+from forms import SettingsForm, TagsForm, PerPageForm
 from SWA_api import SWAAsset, SWAObject
 
 swa_object = SWAObject()
@@ -23,34 +23,35 @@ def library():
     heading = ''
     page_num = request.args.get('p', default=1, type=int)
     tag_name = request.args.get('tag', default='', type=str)
-    per_page = request.args.get('pp', default=20, type=int)
+    per_page = swa_object.settings.per_page
     need_upd = request.args.get('show_need_upd', default=0, type=int)
     library_filter = request.form.get('library_filters_choices', default=0, type=int)
+
+    per_page_form = PerPageForm(request.form)
+    if per_page_form.per_page_selector.data:
+        per_page = int(per_page_form.per_page_selector.data)
 
     tags = [tag['tag'] for tag in list(tags_coll.find({}))]
     tags_form = TagsForm(request.form)
     selected_tag = tags_form.tag_choices.data or tag_name or request.form.get('tag')
-    show_need_upd = request.form.get('show_need_upd', type=int) or need_upd
     fltr = {}
     if selected_tag:
         tag = tags_coll.find_one({'tag': selected_tag})
         fltr.update({'tags': tag['_id']})
-    if (request.method == 'POST' and request.form.get('update') == 'true'):
+    if request.form.get('update_database') == 'true':
         swa_object.check_updates()
-    if show_need_upd:
+    if need_upd:
         fltr.update({'need_update': True})
 
-    if library_filter == 1:
-        fltr.update({'need_update': True})
     if library_filter == 2:
         fltr.update({'is_installed': True})
     if library_filter == 3:
         fltr.update({'is_installed': False})
 
-    if show_need_upd == 1:
-        no_show_need_upd = 0
-    elif show_need_upd == 0:
-        no_show_need_upd = 1
+    if need_upd == 1:
+        no_need_upd = 0
+    elif need_upd == 0:
+        no_need_upd = 1
 
     assets_count = assets_coll.count_documents(fltr)
     last_page = assets_count // per_page + 1
@@ -80,8 +81,8 @@ def library():
             'hover_title': hover_title,
             'style': f'color: {color}; display: {display}',
             'need_update': str(asset.info['need_update']),
-            'preview_path': url_for('previews',
-                                    assetid=asset.info['preview_path'].split('/')[-1])
+            'preview_path': url_for(
+                'previews', assetid=asset.info['preview_path'].split('/')[-1])
         })
 
     return render_template('library.html',
@@ -93,23 +94,26 @@ def library():
                            last_page=last_page,
                            tags=tags,
                            tags_form=tags_form,
+                           per_page_form=per_page_form,
                            selected_tag=selected_tag,
-                           show_need_upd=show_need_upd,
-                           no_show_need_upd=no_show_need_upd)
+                           show_need_upd=need_upd,
+                           no_show_need_upd=no_need_upd)
 
 
 @app.route('/library/<id>', methods=['GET', 'POST'])
 def library_page(id):
-    asset = SWAAsset(id, swa_object)
+    asset = SWAAsset(int(id), swa_object)
     asset.get_info()
     if (request.method == 'POST' and request.form['download_asset'] == 'true'):
         asset.download()
         asset.get_info()
     asset_details = asset.info
-    asset_details.preview_path = url_for('previews',
-                                         assetid=asset.info.preview_path.split('/')[-1])
-    asset_details.file_size = round(asset_details.file_size/1024/1024, 3)
-    asset_details.tags = [tag.tag for tag in asset_details.tags]
+    asset_details['preview_path'] = url_for(
+        'previews',
+        assetid=asset.info['preview_path'].split('/')[-1]
+    )
+    asset_details['file_size'] = round(asset_details['file_size']/1024/1024, 3)
+    asset_details['tags'] = [tag.tag for tag in asset_details['tags']]
     return render_template('library_page.html',
                            asset_details=asset_details)
 
@@ -117,8 +121,8 @@ def library_page(id):
 @app.route('/about')
 def about():
     title = 'SWA | About'
-    heading = 'Welcome'
-    content = ''
+    heading = 'About the SWA Project'
+    content = 'Test content'
     return render_template('about.html',
                            title=title,
                            heading=heading,
@@ -140,6 +144,7 @@ def settings_page():
 
     if request.method == 'POST':
         path = form.common_path.data
+        data = form.data
 
     return render_template('settings.html',
                            title=title,
