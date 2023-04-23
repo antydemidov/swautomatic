@@ -24,14 +24,15 @@ import json
 import os
 from urllib.parse import quote_plus
 
-from decouple import config
-from jsonschema import validate
+from jsonschema import ValidationError, validate
+
+from config import Config
 
 __version__ = 'v0.0.1'
 __author__ = 'Anton Demidov | @antydemidov'
 
 UTF8 = 'utf-8'
-
+config = Config()
 
 class SWASettings:
     """# Class `SWASettings`
@@ -88,61 +89,44 @@ class SWASettings:
     value to the `settings.json` file. It then updates the instance variable with
     the new value."""
     def __init__(self) -> None:
-        self.host: str = config('HOST', default='') # outdated
-        self.port: str = config('PORT', default='') # outdated
-        self.user: str = config('MONGO_USERNAME', default='') # outdated
-        self.password: str = config('MONGO_PASSWORD', default='') # outdated
-        self.authmechanism: str = ''
-        self.authsource: str = ''
-        self.common_path: str = ''
-        self.appid: int = 0
-        self.app_path: str = ''
-        self.database_name: str = ''
-        self.user_url_profiles: str = ''
-        self.user_url_id: str = ''
-        self.asset_url: str = ''
-        self.user_favs_url: str = ''
-        self.links_file_path: str = ''
-        self.previews_path: str = ''
-        self.steam_api_url: str = ''
-        self.needed_fields: list = []
-        self.timeout: float = 15.0
-        self.longtimeout: float = 60.0
-        self.per_page: int = 20
-
         try:
             with open('settings.json', 'r', encoding=UTF8) as file:
                 settings: dict = json.load(file)
-            with open('schema.json', 'r', encoding=UTF8) as file:
-                schema = json.load(file)
         except FileNotFoundError('Check the file settings.json') as error:
             raise error
 
-        # ChatGPT said to use cerberus instead of jsonschema
-        validate(settings, schema)
-        for key, value in settings.items():
-            setattr(self, key, value)
+        self.app_path: str = settings.get('app_path', '')
+        self.appid: int = settings.get('appid', 0)
+        self.asset_url: str = settings.get('asset_url', '')
+        self.authmechanism: str = settings.get('authmechanism', '')
+        self.author_needed_fields: list = ['steamID64', 'steamID', 'avatarIcon', 'avatarMedium', 'avatarFull', 'customURL']
+        self.authsource: str = settings.get('authsource', '')
+        self.common_path: str = settings.get('common_path', '')
+        self.database_name: str = settings.get('database_name', '')
+        # self.links_file_path: str = settings.get('links_file_path', '')
+        self.longtimeout: float = settings.get('longtimeout', 60.0)
+        self.needed_fields: list = settings.get('needed_fields', None)
+        self.per_page: int = settings.get('per_page', 20)
+        self.previews_path: str = settings.get('previews_path', '')
+        self.steam_api_url: str = settings.get('steam_api_url', '')
+        self.timeout: float = settings.get('timeout', 15.0)
+        self.user_favs_url: str = settings.get('user_favs_url', '')
+        self.user_url_id: str = settings.get('user_url_id', '')
+        self.user_url_profiles: str = settings.get('user_url_profiles', '')
 
-        self.assets_path = f'{self.common_path}/Maps'
-        self.mods_path = f'{self.common_path}/Mods'
-        self.links_file_path = f'{self.common_path}/links.txt'
+        # ChatGPT said to use cerberus instead of jsonschema
+        # validate(settings, schema)
+
+        self.assets_path = os.path.join(self.common_path, 'Maps')
+        self.mods_path = os.path.join(self.common_path, 'Mods')
         if self.app_path == '':
             self.app_path = os.path.abspath(os.path.curdir)
+        # self.links_file_path = os.path.join(self.app_path, 'links.txt')
 
-        if (self.user == '' or self.password == ''):
-            raise ValueError(
-                'Connection needs username and password! Check settings.json')
-        if (self.host == '' or self.port == ''):
-            raise ValueError(
-                'Connection needs host and port! Check settings.json')
-
-        url = f'mongodb://{quote_plus(self.user)}:{quote_plus(self.password)}'
-        auth = f'{self.host}:{self.port}'
+        url = f'mongodb://{quote_plus(config.MONGO_USERNAME)}:{quote_plus(config.MONGO_PASSWORD)}'
+        auth = f'{config.HOST}:{config.PORT}'
         params = f'?authMechanism={self.authmechanism}&authSource={self.authsource}'
         self.uri = f'{url}@{auth}/{params}'
-
-    # Reseives key and value of the attribute and put it into the attribute
-    # and update the settings.json.
 
     # ChatGPT: It might be more efficient to read in the JSON data once and
     # store it as an attribute, then modify that data directly and write it
@@ -153,11 +137,18 @@ class SWASettings:
         try:
             with open('settings.json', 'r', encoding=UTF8) as file:
                 settings: dict = json.loads(file.read())
+            with open('schema.json', 'r', encoding=UTF8) as file:
+                schema = json.load(file)
             settings.update({key: value})
+            try:
+                validate(settings, schema)
+            except ValidationError as error:
+                print(f'Your settings is not valid: {str(error)}')
+                # TODO: Add an errors catcher. Closes #14
 
             with open('settings.json', 'w', encoding=UTF8) as file:
                 file.write(json.dumps(settings))
             setattr(self, key, value)
         except FileNotFoundError('Check the file settings.json') as error:
             raise error
-        return self
+        # return self

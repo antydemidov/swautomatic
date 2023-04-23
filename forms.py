@@ -24,13 +24,12 @@ class SettingsForm(FlaskForm):
     user_url_id = URLField(label='User URL ID', validators=[InputRequired(), URL()], default=settings.user_url_id)
     asset_url = URLField(label='Asset URL', validators=[InputRequired(), URL()], default=settings.asset_url)
     user_favs_url = URLField(label='User Favourites URL', validators=[InputRequired(), URL()], default=settings.user_favs_url)
-    links_file_path = StringField(label='Links file path', validators=[InputRequired()], default=settings.links_file_path)
+    # links_file_path = StringField(label='Links file path', validators=[InputRequired()], default=settings.links_file_path)
     previews_path = FileField(label='Prviews path', validators=[], default=settings.previews_path)
     steam_api_url = URLField(label='Steam API URL', validators=[InputRequired(), URL()], default=settings.steam_api_url)
     timeout = SelectField(label='Timeout', coerce=float, choices=[5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0], default=settings.timeout)
     longtimeout = SelectField(label='Long timeout', coerce=float, choices=[20.0, 25.0, 30.0, 50.0, 100.0, 150.0, 200.0], default=settings.longtimeout)
     per_page = SelectField(label='Cards per page', coerce=int, choices=[10, 20, 30, 50, 100], default=settings.per_page)
-    settings_submit = SubmitField()
 
 
 class PerPageForm(FlaskForm):

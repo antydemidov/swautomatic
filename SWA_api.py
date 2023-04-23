@@ -54,6 +54,23 @@ class SWAObject:
     def get_asset(self, steam_id: int):
         """Desc"""
         return SWAAsset(steam_id, swa_object=self)
+    
+    def get_assets(self, steam_ids: list = None):
+        """Swautomatic > SWA_api > SWAObject.`get_assets()`
+
+        Bulk getter of `~swautomatic.SWA_api.SWAAsset`.
+        
+        Example:
+        >>> swa_object = SWAObject()
+        >>> swa_object.get_assets([123, 321])
+        ... [SWAAsset(asset_id=123), SWAAsset(asset_id=321)]"""
+
+        coll = self.client.get_database(settings.database_name).get_collection('assets')
+        if not steam_ids:
+            data = coll.find({})
+        else:
+            data = coll.find({'steamid': {'$in': steam_ids}})
+        return [SWAAsset.from_source(self, info) for info in data]
 
     def get_statistics(self):
         """The method returns a CommonResult object that contains the retrieved
@@ -98,7 +115,7 @@ class SWAObject:
                             not_installed=not_installed)
 
     def close(self):
-        """Closes the database clients."""
+        """Closes the database client."""
         self.client.close()
 
     @staticmethod
@@ -282,30 +299,30 @@ class SWAObject:
         data = {}
         steam_data = self.steam_api_data(ids)
         for key, value in steam_data.items():
-            info = {}
             steamid = int(key)
-            info_from_steam = value
-            if not info_from_steam.get('publishedfileid'):
-                info = None
-            else:
+            info_from_steam: dict = value
+            info = None
+            if info_from_steam.get('publishedfileid'):
                 # === steamid ===
                 steamid = int(info_from_steam.get('publishedfileid'))
 
                 # === name ===
-                asset_name = info_from_steam.get('title')
-                name = asset_name if asset_name else None
+                name = info_from_steam.get('title', None)
+                # TODO: Add an errors catcher. Closes #14
 
                 # === tags ===
-                workshop_tags = info_from_steam['tags']
+                workshop_tags = info_from_steam.get('tags')
+                tags = None
                 if workshop_tags:
                     tags = [tags_coll.find_one({'tag': workshop_tag['tag']})[
                         '_id'] for workshop_tag in workshop_tags if workshop_tag is not None]
-                else:
-                    tags = None
+                # TODO: Add an errors catcher. Closes #14
 
                 # === preview ===
+                preview_url = None
+                preview_path = None
                 try:
-                    preview_url = info_from_steam['preview_url']
+                    preview_url = info_from_steam.get('preview_url')
                     with rq.head(preview_url, timeout=settings.timeout) as req:
                         pic_format = req.headers.get(
                             'Content-Type').split('/')[1]
@@ -313,14 +330,11 @@ class SWAObject:
                         preview_path = f'previews/{steamid}.{pic_format}'
                     else:
                         preview_path = f'previews/{steamid}.png'
-                except (KeyError, IndexError, TypeError):
-                    preview_url = None
-                    preview_path = None
-                except Exception as error:
-                    print(
-                        f"An error occurred while processing preview for {steamid}: {str(error)}")
-                    preview_url = None
-                    preview_path = None
+                except (KeyError, IndexError, TypeError, rq.RequestException) as error:
+                    print(f'An error occurred while processing preview for {steamid}: {str(error)}')
+                except Exception:
+                    # TODO: Add an errors catcher. Closes #14
+                    pass
 
                 # === path ===
                 if 'Mod' in workshop_tags:
@@ -329,24 +343,23 @@ class SWAObject:
                     path = os.path.join(settings.assets_path, str(steamid))
 
                 # === is_installed ===
-                is_installed = self.is_installed(steamid)
+                is_installed = self.installed(steamid)
 
                 # === time_local ===
-                if info['is_installed'] is True:
-                    time_local = datetime.fromtimestamp(
-                        os.path.getmtime(info['path']))
-                else:
-                    time_local = None
-                file_size = info_from_steam['file_size']
-                time_created = info_from_steam['time_created']
-                time_updated = info_from_steam['time_updated']
+                time_local = None
+                if is_installed is True:
+                    time_local = datetime.fromtimestamp(os.path.getmtime(path))
+                file_size = info_from_steam.get('file_size')
+                time_created = info_from_steam.get('time_created')
+                time_updated = info_from_steam.get('time_updated')
+
+                # === author ===
                 author = get_author_data(info_from_steam['creator'])
 
                 # === need_update ===
-                need_update = (info['is_installed'] and (
-                    info['time_local'] < info['time_updated']))
+                need_update = (is_installed and (time_local < time_updated))
 
-                info.update({
+                info = {
                     'steamid': steamid,
                     'name': name,
                     'tags': tags,
@@ -360,7 +373,7 @@ class SWAObject:
                     'time_updated': time_updated,
                     'author': author,
                     'need_update': need_update,
-                })
+                }
 
                 # data.update({steamid: SWAAsset.from_source(**info)})
                 data.update({steamid: info})
@@ -388,10 +401,12 @@ class SWAObject:
         ids_in_db = {id['steamid'] for id in assets_coll.find(
             {}, projection={'steamid': True})}
 
-        if ids_from_favs.status_bool is True:
+        if ids_from_favs.status_bool:
             ids_favs = set(getattr(ids_from_favs, 'ids'))
             ids_to_delete = ids_in_db - ids_favs
             ids_to_update = ids_favs - ids_in_db
+            deleted_count = 0
+            inserted_count = 0
             if ids_to_delete:
                 deleted_count = assets_coll.delete_many({
                     'steamid': {'$in': ids_to_delete}
@@ -400,16 +415,12 @@ class SWAObject:
                 #     {'steamid': {'$in': list(ids_to_delete)}}
                 # )
                 # deleted_count = result.deleted_count
-            else:
-                deleted_count = 0
             if ids_to_update:
                 new_data = self.info_steam(list(ids_to_update))
                 inserted_count = len(assets_coll.insert_many(
                     list(new_data.values())).inserted_ids)
                 # result = await assets_coll.insert_many(list(new_data.values()))
                 # inserted_count = len(result.inserted_ids)
-            else:
-                inserted_count = 0
 
         for id_to_update in ids_to_update:
             asset = SWAAsset(id_to_update, swa_object=self)
@@ -425,7 +436,7 @@ class SWAObject:
                             inserted_count=inserted_count,
                             new_items=list(ids_to_update))
 
-    def is_installed(self, steam_id):
+    def installed(self, steam_id):
         """This method takes a `steam_id` as input and returns a boolean value
         indicating whether the corresponding asset or mod is installed on the
         local machine."""
@@ -535,10 +546,8 @@ class SWAAsset:
         self.steamid = int(steamid)
         self.swa_object = swa_object
         self.name: str = ''
-        self.tags: list[int]
+        self.tags: list[SWATag] = None
         self.preview: SWAPreview = None
-        # self.preview_url: str
-        # self.preview_path: str
         self.path: str = ''
         self.is_installed: bool = False
         self.time_local: datetime = datetime.fromordinal(1)
@@ -552,20 +561,32 @@ class SWAAsset:
     # REWRITE THIS CODE TO MAKE IT SMARTER
     # Avoid enumeration of attributes. Add validation with any library for validation.
     @classmethod
-    def from_db(cls, swa_object: SWAObject, info: dict):
+    def from_source(cls, swa_object: SWAObject, info: dict):
         """Creates a new SWAAsset instance from the given dictionary."""
 
         validate(info, swa_asset_schema)
-        # validate(info, swa_author_schema)
-        author = info['author']
+        steam_id = info.get('steamid')
+        author = info.get('author')
         swa_author = SWAAuthor(**author)
-        swa_tags = [SWATag(tag) for tag in info['tags']]
+        swa_tags = [SWATag(tag) for tag in info.get('tags')]
+        swa_preview = SWAPreview(info.get('preview_url'), steam_id, swa_object)
 
         info.update({'author': swa_author, 'tags': swa_tags})
 
-        asset = cls(info['steamid'], swa_object=swa_object)
+        asset = cls(steam_id, swa_object=swa_object)
         for key, value in info:
-            setattr(asset, key, value)
+            if key in ['preview_url', 'preview_path']:
+                setattr(asset, 'preview', swa_preview)
+            elif key == 'tags':
+                setattr(asset, 'tags', swa_tags)
+            elif key == 'author':
+                setattr(asset, 'author', swa_author)
+            else:
+                setattr(asset, key, value)
+        if 'Mod' in info.get('path')
+            setattr(asset, 'type', 'mod')
+        else:
+            setattr(asset, 'type', 'asset')
 
         return asset
 
@@ -602,16 +623,16 @@ class SWAAsset:
             info = self.info_steam()
         return info
 
-    def update_preview_url(self):
-        """# SWAAsset.`update_preview_url()`
-        Updates the data in DB about previews' urls."""
+    # def update_preview_url(self):
+    #     """# SWAAsset.`update_preview_url()`
+    #     Updates the data in DB about previews' urls."""
 
-        info = self.info_steam()
-        if info:
-            assets_coll.update_one(
-                {'steamid': self.steamid},
-                {'$set': {'preview_url': info['preview_url']}}
-            )
+    #     info = self.info_steam()
+    #     if info:
+    #         assets_coll.update_one(
+    #             {'steamid': self.steamid},
+    #             {'$set': {'preview_url': info['preview_url']}}
+    #         )
 
     def download(self) -> bool:
         """This method `download()` downloads and extracts a Steam Workshop asset
@@ -666,10 +687,19 @@ class SWAAsset:
         return status
 
     def installed(self):
-        """Checks if the asset is installed."""
+        """This method takes a `steam_id` as input and returns a boolean value
+        indicating whether the corresponding asset or mod is installed on the
+        local machine."""
         asset_path = os.path.join(settings.assets_path, str(self.steamid))
         mod_path = os.path.join(settings.mods_path, str(self.steamid))
-        return os.path.exists(asset_path) or os.path.exists(mod_path)
+
+        try:
+            is_installed = os.path.exists(
+                asset_path) or os.path.exists(mod_path)
+        except OSError:
+            is_installed = False
+
+        return is_installed
 
     def get_files(self):
         """Returns a dict {file name: file size}."""
@@ -726,7 +756,7 @@ class SWAAuthor:
 
     def __post_init__(self):
         self.steamID64 = int(self.steamID64)
-        validate(dict(self), swa_author_schema)
+        validate(self.__dict__, swa_author_schema)
 
 
 class SWAPreview:
@@ -756,26 +786,12 @@ class SWAPreview:
     as the size and content length of the downloaded file. If successful, `status` is
     'Done', `status_bool` is True, `size` is the size of the downloaded file, and `content_length`
     is the expected content length. Otherwise, `status` is 'Error', `status_bool` is False, `size`
-    is 0, and `content_length` is the expected content length.
-
-    ## Example:
-    >>> from SWAObject import SWAObject
-    ...
-    ... # Initialize a new SWAObject instance
-    >>> swa_object = SWAObject()
-    ...
-    ... # Create a new preview object for the item with Steam Workshop ID 12345
-    >>> preview = SWAPreview('https://steamcommunity.com/sharedfiles/filedetails/?id=12345&preview=true', 12345, swa_object)
-    ...
-    ... # Download the preview image
-    >>> result = preview.download()
-    ...
-    ... # Print the download result
-    >>> print(f"Download status: {result.status}, Size: {result.size} bytes")"""
+    is 0, and `content_length` is the expected content length."""
 
     def __init__(self, url: str, steam_id: int, swa_object: SWAObject):
-        self.url = url
         self.swa_object = swa_object
+        self.preview_url = url
+        self.preview_path = os.path.join(swa_object.settings.previews_path, steam_id)
         headers = None
         try:
             with rq.head(url, timeout=settings.timeout) as req:
@@ -790,9 +806,14 @@ class SWAPreview:
         else:
             pic_format = 'png'
 
-        self.path = os.path.join(settings.previews_path,
+        self.path = os.path.join(settings.app_path, settings.previews_path,
                                  f"{steam_id}.{pic_format}")
         self.format = pic_format
+
+    def to_dict(self):
+        """Returns a dict for database"""
+        return {'preview_url': self.preview_url,
+                'preview_path': self.preview_path}
 
     def download(self):
         """Downloads the file from `self.url`, saves it to `self.path` and checks
@@ -819,7 +840,7 @@ class SWAPreview:
         # images, using asynchronous I/O could be more efficient than using a
         # thread pool. You could use a library like asyncio to implement this.
 
-        with rq.get(self.url, timeout=settings.timeout) as req:
+        with rq.get(self.preview_url, timeout=settings.timeout) as req:
             if req.status_code == 200:
                 content_length = int(req.headers.get('Content-Length'))
                 with open(self.path, 'wb') as file:

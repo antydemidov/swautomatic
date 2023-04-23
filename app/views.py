@@ -1,7 +1,7 @@
 """Here must be the string"""
 from flask import render_template, request, send_from_directory, url_for
 from app import app
-from connection import assets_coll, tags_coll#, client, settings,
+from connection import assets_coll, tags_coll
 from forms import SettingsForm, TagsForm, PerPageForm
 from SWA_api import SWAAsset, SWAObject
 
