@@ -5,21 +5,18 @@ __author__ = 'Anton Demidov | @antydemidov'
 
 
 class CommonResult:
-    """# Class `CommonResult`
+    """## Swautomatic > Results > `CommonResult`
     Describes a result of some functions and methods.
 
-    ## Attributes
-    `status`: str
-        A string representating a status of running.
-    `status_bool`: bool
-        Boolean variant of status.
-    `details`: dict
-        A dictionary containing detatils of running."""
+    ### Attributes
+    - `status` (str): A string representating a status of running.
+    - `status_bool` (bool): Boolean variant of status.
+    - `details` (dict): A dictionary containing detatils of running."""
     def __init__(
         self,
         status: str = '',
         status_bool: bool = True,
-        details: dict = None,   # dict
+        details: dict = None,
         **kwargs
     ):
         self.status = status

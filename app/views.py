@@ -1,7 +1,7 @@
 """Here must be the string"""
 from flask import render_template, request, send_from_directory, url_for
 from app import app
-from connection import assets_coll, tags_coll
+from connection import assets_coll, tags_coll, settings
 from forms import SettingsForm, TagsForm, PerPageForm
 from SWA_api import SWAAsset, SWAObject
 
@@ -57,13 +57,11 @@ def library():
     last_page = assets_count // per_page + 1
     assets_list = [asset['steamid'] for asset in list(
         assets_coll.find(fltr, limit=per_page, skip=(page_num-1)*per_page))]
-    assets_cl_list = [SWAAsset(asset, swa_object) for asset in assets_list]
-    for asset in assets_cl_list:
-        asset.get_info()
+    assets_cl_list = swa_object.get_assets(assets_list)
     datalist = []
 
     for asset in assets_cl_list:
-        if asset.info['is_installed']:
+        if asset.is_installed:
             color = 'lightcoral'
             hover_title = 'Installed'
             display = 'flex'
@@ -73,16 +71,16 @@ def library():
             display = 'none'
         datalist.append({
             'id': str(asset.steamid),
-            'name': str(asset.info['name']),
-            'is_installed': str(asset.info['is_installed']),
-            'file_size': str(round(asset.info['file_size']/1024/1024, 3)) + ' MB',
-            'author_steamID': str(asset.info['author']['steamID']),
-            'author_avatarIcon': str(asset.info['author']['avatarIcon']),
+            'name': str(asset.name),
+            'is_installed': str(asset.is_installed),
+            'file_size': str(round(asset.file_size/1024/1024, 3)) + ' MB',
+            'author_steamID': str(asset.author.steam_id),
+            'author_avatarIcon': str(asset.author.avatar_icon),
             'hover_title': hover_title,
             'style': f'color: {color}; display: {display}',
-            'need_update': str(asset.info['need_update']),
+            'need_update': str(asset.need_update),
             'preview_path': url_for(
-                'previews', assetid=asset.info['preview_path'].split('/')[-1])
+                'previews', assetid=asset.preview.path.split('\\')[-1])
         })
 
     return render_template('library.html',
@@ -103,17 +101,15 @@ def library():
 @app.route('/library/<id>', methods=['GET', 'POST'])
 def library_page(id):
     asset = SWAAsset(int(id), swa_object)
-    asset.get_info()
     if (request.method == 'POST' and request.form['download_asset'] == 'true'):
         asset.download()
-        asset.get_info()
-    asset_details = asset.info
+        
+    asset_details = asset.to_dict()
     asset_details['preview_path'] = url_for(
-        'previews',
-        assetid=asset.info['preview_path'].split('/')[-1]
+        'previews', assetid=asset.preview.path.split('\\')[-1]
     )
     asset_details['file_size'] = round(asset_details['file_size']/1024/1024, 3)
-    asset_details['tags'] = [tag.tag for tag in asset_details['tags']]
+    asset_details['tags'] = [tag.tag for tag in asset.tags]
     return render_template('library_page.html',
                            asset_details=asset_details)
 
@@ -132,7 +128,7 @@ def about():
 @app.route('/previews/<assetid>')
 def previews(assetid):
     path = assetid
-    return send_from_directory('../previews', path)
+    return send_from_directory(f'../{settings.previews_path}', path)
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings_page():

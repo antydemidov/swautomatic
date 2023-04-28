@@ -7,7 +7,7 @@ swa_asset_schema = {
         "name": {"type": "string"},
         "tags": {"type": "array", "items": {"type": "integer"}},
         "preview_url": {"type": "string"},
-        "preview_path": {"type": "string"},
+        # "preview_path": {"type": "string"},
         "path": {"type": "string"},
         "is_installed": {"type": "boolean"},
         "time_local": {"type": "string", "format": "date-time"},
@@ -18,20 +18,19 @@ swa_asset_schema = {
         "need_update": {"type": "boolean"}
     },
     "required": [
-        "swa_object",
         "steamid",
         "name",
         "tags",
         "preview_url",
-        "preview_path",
+        # "preview_path",
         "path",
         "is_installed",
-        "time_local",
+        # "time_local",
         "file_size",
         "time_created",
-        "time_updated",
+        # "time_updated",
         "author",
-        "need_update"
+        # "need_update",
     ]
 }
 

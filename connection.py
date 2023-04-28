@@ -1,4 +1,4 @@
-"""Let you connect to MongoDB databases of BoD project"""
+"""Let you connect to MongoDB databases of Swautomatic project."""
 
 from pymongo import MongoClient
 

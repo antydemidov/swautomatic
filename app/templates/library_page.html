@@ -65,37 +65,43 @@
             </svg>
         </button>
         {% endif %}
+        <button class="library_toolbar_item" disabled="disabled" download_title="Coming soon!"></button>
+        <button class="library_toolbar_item" disabled="disabled" download_title="Coming soon!"></button>
+        <button class="library_toolbar_item" disabled="disabled" download_title="Coming soon!"></button>
     </form>
     <div class="library_page_author">
-        <img src="{{ asset_details['author']['avatarIcon'] }}">
-        <p>{{ asset_details['author']['steamID'] }}</p>
+        <img src="{{ asset_details['author']['avatar_icon'] }}">
+        <p>{{ asset_details['author']['steam_id'] }}</p>
     </div>
 </div>
-<table class="library_page_table shadow">
-    <tr>
-        <th>Steam ID</th>
-        <td>{{ asset_details['steamid'] }}</td>
-    </tr>
-    <tr>
-        <th>Tags</th>
-        <td>
-            {% for tag in asset_details['tags'] %}
-            <a href="{{ url_for('library', tag=tag) }}">{{ tag }}</a>
-            {% endfor %}
-        </td>
-    </tr>
-    <tr>
-        <th>File size</th>
-        <td>{{ asset_details['file_size'] }} MB</td>
-    </tr>
-    <tr>
-        <th>Time created</th>
-        <td>{{ asset_details['time_created'] }}</td>
-    </tr>
-    <tr>
-        <th>Time updated</th>
-        <td>{{ asset_details['time_updated'] }}</td>
-    </tr>
-</table>
+<div class="library_page_content">
+    <table class="library_page_table shadow">
+        <tr>
+            <th>Steam ID</th>
+            <td>{{ asset_details['steamid'] }}</td>
+        </tr>
+        <tr>
+            <th>Tags</th>
+            <td>
+                {% for tag in asset_details['tags'] %}
+                <a href="{{ url_for('library', tag=tag) }}">{{ tag }}</a>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <th>File size</th>
+            <td>{{ asset_details['file_size'] }} MB</td>
+        </tr>
+        <tr>
+            <th>Time created</th>
+            <td>{{ asset_details['time_created'] }}</td>
+        </tr>
+        <tr>
+            <th>Time updated</th>
+            <td>{{ asset_details['time_updated'] }}</td>
+        </tr>
+    </table>
+    <div class="library_page_requirements shadow"></div>
+</div>
 
 {% endblock %}
