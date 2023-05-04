@@ -12,6 +12,9 @@
     "links_file_path": "links.txt",
     "previews_path": "previews",
     "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1",
+    "timeout": 15.0,
+    "longtimeout": 60.0,
+    "per_page": 20,
     "needed_fields": [
         "creator",
         "file_size",

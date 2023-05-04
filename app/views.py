@@ -1,21 +1,18 @@
-from flask import (render_template, request, send_from_directory,
-                   url_for)
-
+"""Here must be the string"""
+import os
+from flask import render_template, request, send_from_directory, url_for
 from app import app
-from connection import Connection
-from forms import *
-from settings import SWASettings
-from SWA_api import Asset, SWAObject
+from connection import assets_coll, tags_coll, settings
+from forms import SettingsForm, TagsForm, PerPageForm
+from SWA_api import SWAAsset, SWAObject
+from utils import get_size_format
 
 swa_object = SWAObject()
-settings = SWASettings()
-db = Connection(settings.database_name)
-assets_db = db.get_coll('assets')
-tags_db = db.get_coll('tags')
+
 
 @app.route('/')
 def index():
-    title = 'Steam Workshop Automatic'
+    title = 'SWA | Main'
     heading = 'Welcome'
     content = 'Steam Workshop Automatic is an app to manage assets and mods.'
     return render_template('index.html',
@@ -23,71 +20,67 @@ def index():
                            heading=heading,
                            content=content)
 
+
 @app.route('/library', methods=['GET', 'POST'])
 def library():
     title = 'SWA | Library'
     heading = ''
     page_num = request.args.get('p', default=1, type=int)
     tag_name = request.args.get('tag', default='', type=str)
-    per_page = request.args.get('pp', default=20, type=int)
-    need_upd = request.args.get('show_need_upd', default=0, type=int)
-    library_filter = None
+    per_page = swa_object.settings.per_page
+    need_upd = request.form.get('show_need_upd', default=0, type=int)
+    library_filter = request.form.get(
+        'library_filters_choices', default=0, type=int)
 
-    if request.method == 'POST':
-        library_filter = request.form.get('library_filters_choices', default=0, type=int)
+    per_page_form = PerPageForm(request.form)
+    if per_page_form.per_page_selector.data:
+        per_page = int(per_page_form.per_page_selector.data)
 
-    tags = [tag['tag'] for tag in list(tags_db.find({}))]
+    tags = [tag['tag'] for tag in list(tags_coll.find({}))]
     tags_form = TagsForm(request.form)
     selected_tag = tags_form.tag_choices.data or tag_name or request.form.get('tag')
-    show_need_upd = request.form.get('show_need_upd', type=int) or need_upd
     fltr = {}
     if selected_tag:
-        tag = tags_db.find_one({'tag': selected_tag})
-        fltr.update({'tags': tag['_id']})
-    if (request.method == 'POST' and request.form.get('update') == 'true'):
+        tag = tags_coll.find_one({'tag': selected_tag})
+        fltr.update({'tags': tag['tag']})
+    # Update status
+    if request.form.get('update_database', 'false') == 'true':
         swa_object.check_updates()
-    if show_need_upd:
+    # DANGER ZONE FULL UPDATE
+    if request.form.get('reload_database', 'false') == 'true':
+        pass
+
+    if need_upd:
         fltr.update({'need_update': True})
 
+    # if library_filter == 0: do nothing
     if library_filter == 1:
-        fltr.update({'need_update': True})
-    if library_filter == 2:
         fltr.update({'is_installed': True})
-    if library_filter == 3:
+    if library_filter == 2:
         fltr.update({'is_installed': False})
 
-    if show_need_upd == 1: no_show_need_upd = 0
-    elif show_need_upd == 0: no_show_need_upd = 1
+    no_need_upd = 0 if need_upd == 1 else 1
 
-    assets_count = assets_db.count_documents(fltr)
+    assets_count = assets_coll.count_documents(fltr)
     last_page = assets_count // per_page + 1
-    assets_list = [asset['steamid'] for asset in list(assets_db.find(fltr, limit=per_page, skip=(page_num-1)*per_page))]
-    assets_cl_list = [Asset(asset) for asset in assets_list]
-    for asset in assets_cl_list:
-        asset.get_stats()
+    assets_list = [asset['steamid'] for asset in list(
+        assets_coll.find(fltr, limit=per_page, skip=(page_num-1)*per_page))]
+    assets_cl_list = swa_object.get_assets(assets_list)
     datalist = []
-    for i in range(len(assets_cl_list)):
-        if assets_cl_list[i].info.is_installed == True:
-            color = 'lightcoral'
-            hover_title = 'Installed'
-            display = 'flex'
-        else:
-            color = '#0000'
-            hover_title = 'Not installed'
-            display = 'none'
+
+    statistics = swa_object.get_statistics()
+
+    for asset in assets_cl_list:
         datalist.append({
-            'id': str(assets_cl_list[i].id),
-            'name': str(assets_cl_list[i].info.name),
-            'is_installed': str(assets_cl_list[i].info.is_installed),
-            'file_size': str(round(assets_cl_list[i].info.file_size/1024/1024, 3)) + ' MB',
-            'author_steamID': str(assets_cl_list[i].info.author.steamID),
-            'author_avatarIcon': str(assets_cl_list[i].info.author.avatarIcon),
-            'hover_title': hover_title,
-            'style': 'color:' + color + '; display: ' + display,
-            'need_update': str(assets_cl_list[i].info.need_update),
-            'preview_path': url_for('previews', assetid=assets_cl_list[i].info.preview_path.split('/')[-1])
+            'steamid': str(asset.steamid),
+            'name': str(asset.name),
+            'is_installed': asset.is_installed,
+            'file_size': get_size_format(asset.file_size),
+            'author_steamID': str(asset.author.steam_id),
+            'author_avatarIcon': str(asset.author.avatar_icon),
+            # 'need_update': asset.need_update,
         })
-            
+
     return render_template('library.html',
                            title=title,
                            heading=heading,
@@ -97,32 +90,43 @@ def library():
                            last_page=last_page,
                            tags=tags,
                            tags_form=tags_form,
+                           per_page_form=per_page_form,
                            selected_tag=selected_tag,
-                           show_need_upd=show_need_upd,
-                           no_show_need_upd=no_show_need_upd)
+                           show_need_upd=need_upd,
+                           no_show_need_upd=no_need_upd,
+                           statistics=statistics,
+                           )
 
 
-@app.route('/library/<id>', methods=['GET', 'POST'])
-def library_page(id):
-    asset = Asset(id)
-    asset.get_stats()
-    if (request.method == 'POST' and request.form['download_asset'] == 'true'):
+@app.route('/library/<steam_id>', methods=['GET', 'POST'])
+def library_page(steam_id):
+    asset = SWAAsset(int(steam_id), swa_object)
+    if request.form.get('download_asset', 'false') == 'true':
         asset.download()
-        asset.get_stats()
-    asset_details = asset.info
-    asset_details.preview_path = url_for('previews', assetid=asset.info.preview_path.split('/')[-1])
-    asset_details.file_size = round(asset_details.file_size/1024/1024, 3)
-    asset_details.tags = [tag.tag for tag in asset_details.tags]
+    if request.form.get('update_asset', 'false') == 'true':
+        asset.update_record()
+
+    asset_details = asset.to_dict()
+    asset_details['preview_path'] = url_for('previews', assetid=steam_id)
+    asset_details['file_size'] = get_size_format(asset_details['file_size'])
+    asset_details['tags'] = asset.tags if asset.tags is not None else [
+        'No tags']
+    files = {}
+    i = 1
+    for key, value in asset.get_files().items():
+        files.update({key: {'id': i, 'size': get_size_format(value)}})
+        i += 1
+    asset_details['files'] = files.items()
     return render_template('library_page.html',
-        asset_details=asset_details)
+                           asset_details=asset_details)
 
 
 @app.route('/about')
 def about():
     title = 'SWA | About'
-    heading = 'Welcome'
-    content = ''
-    return render_template('library.html',
+    heading = 'About the SWA Project'
+    content = 'Test content'
+    return render_template('about.html',
                            title=title,
                            heading=heading,
                            content=content)
@@ -130,11 +134,17 @@ def about():
 
 @app.route('/previews/<assetid>')
 def previews(assetid):
-    path = assetid
-    return send_from_directory('../previews', path)
+    path = None
+    assetid = str(assetid)
+    for file in os.listdir(settings.previews_path):
+        if assetid in file:
+            path = file
+    if path:
+        return send_from_directory(f'../{settings.previews_path}', path)
+
 
 @app.route('/settings', methods=['GET', 'POST'])
-def settings():
+def settings_page():
     title = 'SWA | Settings'
     heading = 'Settings'
 
@@ -143,6 +153,7 @@ def settings():
 
     if request.method == 'POST':
         path = form.common_path.data
+        data = form.data
 
     return render_template('settings.html',
                            title=title,
