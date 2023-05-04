@@ -34,7 +34,7 @@
 <div class="library_page_underhead shadow">
     <form class="library_page_toolbar" method="post">
         {% if asset_details['need_update'] == True %}
-        <button name="download_asset" value="true" type="submit" download_title="Download asset" formmethod="post"
+        <button name="download_asset" value="true" type="submit" hover-content="Download asset" formmethod="post"
             onClick="hide_show();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -46,7 +46,7 @@
         </button>
         {% elif asset_details['is_installed'] == True %}
         <button name="downloaded_asset" value="False" type="button" style="cursor:not-allowed"
-            download_title="Asset is downloaded">
+            hover-content="Asset is downloaded">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="feather feather-check">
@@ -54,7 +54,7 @@
             </svg>
         </button>
         {% else %}
-        <button name="download_asset" value="true" type="submit" download_title="Download asset" formmethod="post"
+        <button name="download_asset" value="true" type="submit" hover-content="Download asset" formmethod="post"
             onClick="hide_show();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-download"
@@ -65,9 +65,26 @@
             </svg>
         </button>
         {% endif %}
-        <button class="library_toolbar_item" disabled="disabled" download_title="Coming soon!"></button>
-        <button class="library_toolbar_item" disabled="disabled" download_title="Coming soon!"></button>
-        <button class="library_toolbar_item" disabled="disabled" download_title="Coming soon!"></button>
+        <button class="library_toolbar_item" type="submit" hover-content="Coming soon!" value="true" name="update_asset"
+            onClick="hide_show();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
+        <button class="library_toolbar_item" disabled="disabled" hover-content="Coming soon!">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-trash-2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+        </button>
+        <button class="library_toolbar_item" disabled="disabled" hover-content="Coming soon!"></button>
     </form>
     <div class="library_page_author">
         <img src="{{ asset_details['author']['avatar_icon'] }}">
@@ -84,13 +101,13 @@
             <th>Tags</th>
             <td>
                 {% for tag in asset_details['tags'] %}
-                <a href="{{ url_for('library', tag=tag) }}">{{ tag }}</a>
+                <a href="{{ url_for('library', tag=tag.tag) }}">{{ tag.tag }}</a>
                 {% endfor %}
             </td>
         </tr>
         <tr>
             <th>File size</th>
-            <td>{{ asset_details['file_size'] }} MB</td>
+            <td>{{ asset_details['file_size'] }}</td>
         </tr>
         <tr>
             <th>Time created</th>
@@ -102,6 +119,29 @@
         </tr>
     </table>
     <div class="library_page_requirements shadow"></div>
+</div>
+<div class="library_page_files shadow">
+    <table class="library_page_files_table">
+        {% for path, data in asset_details['files'] %}
+        <tr>
+            <th>{{data['id']}}</th>
+            <td>{{path}}</td>
+            <td>{{data['size']}}</td>
+            <td class="library_page_files_table_button">
+                <button type="submit" disabled="disabled" value="{{data['id']}}" hover-content="Coming soon!">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-trash-2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 
 {% endblock %}

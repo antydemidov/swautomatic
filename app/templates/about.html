@@ -1,7 +1,62 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>{{ heading }}</h1>
-<p>{{ content }}</p>
+<h1 id="top">{{ heading }}</h1>
+<!-- <p>{{ content }}</p> -->
+<h2>Table of Content</h2>
+<ul>
+    <li><a href="#what_is_it">What is it?</a></li>
+    <li><a href="#main_features">Main features</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#requirements">Requirements</a></li>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#documentation">Documentation</a></li>
+    <li><a href="#license">License</a></li>
+</ul>
 
+<h2 id="what_is_it">What is it? <a href="#top">↑</a></h2>
+<p>Python & Flask web-app that automatically updates mods for the game.</p>
+
+<p>Current version: <code>v0.1</code></p>
+<p>It may have a lot of errors. So please be careful and patient.</p>
+
+<h2 id="main_features">Main features <a href="#top">↑</a></h2>
+<ol>
+    <li>Collecting you favourite assets from Steam Workshop;</li>
+    <li>Checking the updates;</li>
+    <li>Downloading assets and mods;</li>
+    <li>Filtering assets by tags;</li>
+    <li><i>will be updated soon.</i></li>
+</ol>
+
+<h2 id="roadmap">Roadmap <a href="#top">↑</a></h2>
+<ol>
+    <li>Detect files from zip files and manage it. Delete extra files.</li>
+    <li>Check requirements of assets and mods.</li>
+</ol>
+
+<p>You can check the <a href="https://github.com/antydemidov/swautomatic/issues">issues</a></p>
+
+<h2 id="requirements">Requirements <a href="#top">↑</a></h2>
+<ul>
+    <li><b>Python 3.11</b></li>
+    <li>beautifulsoup4 - 4.11.1</li>
+    <li>python-decouple - 3.6</li>
+    <li>Flask - 2.2.3</li>
+    <li>Flask-WTF - 1.0.1</li>
+    <li>jsonschema - 4.17.3</li>
+    <li>pymongo - 4.3.3</li>
+    <li>python-decouple - 3.8</li>
+    <li>python-dotenv - 0.21.0</li>
+    <li>requests - 2.28.1</li>
+</ul>
+
+<h2 id="installation">Installation <a href="#top">↑</a></h2>
+<p>Read more [here](/docs.md#installation)</p>
+
+<h2 id="documentation">Documentation <a href="#top">↑</a></h2>
+<p>Read [here](/docs.md)</p>
+
+<h2 id="license">License <a href="#top">↑</a></h2>
+<p>MIT License</p>
 {% endblock %}

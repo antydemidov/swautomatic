@@ -2,14 +2,17 @@
 
 Current Version: v0.1
 
-**Table of Contents**
+## Table of Contents
 
 - [Steam Workshop Automatic](#steam-workshop-automatic)
+  - [Table of Contents](#table-of-contents)
   - [License](#license)
   - [Installation](#installation)
   - [Objects](#objects)
     - [Class `SWAObject`](#class-swaobject)
     - [Class `SWAAsset`](#class-swaasset)
+      - [SWAAsset.`to_dict()`](#swaassetto_dict)
+      - [SWAAsset.`download()`](#swaassetdownload)
 
 ## License
 
@@ -18,45 +21,45 @@ MIT License
 ## Installation
 
 1. Устанавливаем MongoDB community edition
-2. Заходим в `mongosh`
+1. Заходим в `mongosh`
 
-```powershell
-mongosh
-```
+    ```powershell
+    mongosh
+    ```
 
-3. Выписываем себе пользователя `admin` и записываем `MONGO_USERNAME`, `MONGO_PASSWORD` в `.env` файл (пример лежит в `.env.example`)
+1. Выписываем себе пользователя `admin` и записываем `MONGO_USERNAME`, `MONGO_PASSWORD` в `.env` файл (пример лежит в `.env.example`)
 
-```mongosh
-use admin
-db.createUser(
-  {
-    user: "<MONGO_USERNAME>",
-    pwd: "<MONGO_PASSWORD>",
-    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
-  }
-)
-```
+    ```mongosh
+    use admin
+    db.createUser(
+      {
+        user: "<MONGO_USERNAME>",
+        pwd: "<MONGO_PASSWORD>",
+        roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+      }
+    )
+    ```
 
-4. Создаем базу
+1. Создаем базу
 
-```mongosh
-use CSws
-```
+    ```mongosh
+    use CSws
+    ```
 
-5. Создаем коллекции `assets` и `tags`
+1. Создаем коллекции `assets` и `tags`
 
-```mongosh
-db.createCollection("assets")
-db.createCollection("tags")
-```
+    ```mongosh
+    db.createCollection("assets")
+    db.createCollection("tags")
+    ```
 
-6. Запускаем flask
+1. Запускаем flask
 
-```powershell
-python3 run.py
-```
+    ```powershell
+    python3 run.py
+    ```
 
-И переходим по адресу <http://127.0.0.1:5000>
+И переходим по адресу <http://127.0.0.1:5000> или <http://localhost:5000>
 
 ## Objects
 
@@ -70,12 +73,14 @@ The code defines a class called `SWAAsset`. It seems to be part of a larger proj
 
 The class has an `__init__` method that sets several instance attributes based on the arguments passed. There is also a `from_source` class method that seems to allow for the creation of an instance of the `SWAAsset` class from a dictionary of keyword arguments.
 
-The `to_dict` method returns a dictionary representation of the instance.
+#### SWAAsset.`to_dict()`
 
-The `info_steam` method retrieves information about the asset from a Steam API and returns a `dAsset` instance. The `info_database` method searches for information about the asset in a database and also returns a `dAsset` instance. There is also a `get_info` method that first searches for information about the asset in the database, and if it is not found, retrieves it from the Steam API.
+[Up](#steam-workshop-automatic)
 
-The `download_preview` method downloads a preview image of the asset if it exists and stores it in a local directory.
+Description
 
-Finally, there is a `update_stats_full` method that seems to compare the information about the asset obtained from the database and the Steam API and updates the database if the information differs. However, the method is not well defined, it contains several `FIXME` and `TODO` comments indicating that it is not yet implemented correctly.
+#### SWAAsset.`download()`
 
-Overall, without more context about the project and how this `Asset` class is being used, it is difficult to provide a more detailed analysis of the code.
+[Up](#steam-workshop-automatic)
+
+Description
