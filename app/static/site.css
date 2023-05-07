@@ -64,9 +64,12 @@ p {
 }
 
 .bordered {
-    border-width: 3px;
+    border-width: 4px;
     border-color: var(--disabled-button-color);
     border-style: dotted;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 
 .under_head {
@@ -724,21 +727,21 @@ div.library_card_collection>.library_card:hover+.library_card_details {
 }
 
 .paginator-item {
+    width: 50px;
+    height: 50px;
     border-radius: 100%;
     background: var(--accent-color);
     color: var(--white-color);
-    font-weight: normal;
 }
 
-.paginator-item:hover {
+div.paginator-item {
+    color: var(--disabled-button-color);
+    background: none;
+}
+
+a.paginator-item:hover {
     background: var(--accent-color-darker);
     cursor: pointer;
-}
-
-.paginator-gap,
-.paginator-item {
-    width: 50px;
-    height: 50px;
 }
 
 .settings_form {
