@@ -302,32 +302,40 @@
 <!-- Pagination -->
 <div class="paginator shadow rounded_block">
     {% if page_num == 1 %}
-    <div class="paginator-item">{{ page_num }}</div>
-    {% if last_page > 2 %}
-    <a class="paginator-item"
-        href="{{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num+1}}</a>
-    <div class="paginator-gap"></div>
-    <a class="paginator-item"
-        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
+    <div class="paginator-item bordered">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-chevron-left">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </div>
     {% else %}
-    <a class="paginator-item"
-        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
+    <a href="{{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}"
+        class="paginator-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-chevron-left">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </a>
     {% endif %}
-    {% elif page_num == last_page %}
-    <a class="paginator-item"
-        href="{{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num-1}}</a>
-    <div class="paginator-item">{{ page_num }}</div>
-    <a class="paginator-item"
-        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
+    {% if page_num == last_page %}
+    <div class="paginator-item bordered">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </div>
     {% else %}
-    <a class="paginator-item"
-        href="{{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num-1}}</a>
-    <div class="paginator-item">{{ page_num }}</div>
-    <a class="paginator-item"
-        href="{{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}">{{page_num+1}}</a>
-    <div class="paginator-gap"></div>
-    <a class="paginator-item"
-        href="{{ url_for('library', p=last_page, tag=selected_tag, show_need_upd=show_need_upd) }}">{{last_page}}</a>
+    <a href="{{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}"
+        class="paginator-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </a>
     {% endif %}
 </div>
 
