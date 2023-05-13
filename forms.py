@@ -4,7 +4,7 @@ from wtforms.validators import InputRequired, URL
 from connection import tags_coll, settings
 
 tags = tags_coll.find({})
-tags_names = [tag['tag'] for tag in tags]
+tags_names = sorted([tag['tag'] for tag in tags])
 
 
 class TagsForm(FlaskForm):

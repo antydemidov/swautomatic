@@ -106,8 +106,8 @@
 </div>
 
 <!-- Library Filter -->
-<form class="library_filters shadow rounded_block" id="library_filters" name="library_filters" action="{{ url_for('library') }}"
-    method="post">
+<form class="library_filters shadow rounded_block" id="library_filters" name="library_filters"
+    action="{{ url_for('library') }}" method="post">
     <fieldset>
         <label><input type="radio" name="library_filters_choices" value="0">All items</label>
         <label><input type="radio" name="library_filters_choices" value="1">Installed</label>
@@ -139,7 +139,7 @@
 <div class="danger_zone shadow" id="danger_zone">
     <h3>Danger Zone!</h3>
     <form action="#" method="post">
-        <button class="library_toolbar_item" type="submit" name="reload_database" value="true" onclick="show_loader();"
+        <button class="library_toolbar_item" type="submit" name="total_reset" value="true" onclick="show_loader();"
             hover-content="Reload database">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -156,7 +156,7 @@
 </div>
 
 <!-- Assets Collection -->
-<div class="library_card_collection">
+<div class="library_card_collection" id="library_card_collection">
     {% for asset in datalist %}
     <a class="library_card shadow" href="{{ url_for('library_page', steam_id = asset['steamid']) }}">
         <img src="{{ url_for('previews', assetid=asset['steamid']) }}">
@@ -193,21 +193,46 @@
 
 <!-- Library Toolbar -->
 <form class="library_toolbar shadow rounded_block" method="post">
-    <!-- Update the database -->
-    <button class="library_toolbar_item" type="submit" name="update_database" value="true" onclick="show_loader();"
-        hover-content="Update status of all assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
+    <!-- Update tags -->
+    <button class="library_toolbar_item" type="submit" name="update_tags" value="true" onclick="show_loader();"
+        hover-content="Update tags" action="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-repeat">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+        </svg>
+    </button>
+    <!-- Update status -->
+    <button class="library_toolbar_item" type="submit" name="check_updates" value="true" onclick="show_loader();"
+        hover-content="Update status of all assets" action="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-refresh-cw">
             <polyline points="23 4 23 10 17 10"></polyline>
             <polyline points="1 20 1 14 7 14"></polyline>
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
         </svg>
     </button>
+    <!-- Update the database -->
+    <button class="library_toolbar_item" type="submit" name="update_database" value="true" onclick="show_loader();"
+        hover-content="Update data of all assets" action="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-database">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+        </svg>
+    </button>
     <!-- Button opening the tags window -->
     <button class="library_toolbar_item" type="button" name="open_tag" onClick="show_tags();"
         hover-content="Open tags list">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-list">
             <line x1="8" y1="6" x2="21" y2="6"></line>
             <line x1="8" y1="12" x2="21" y2="12"></line>
             <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -278,11 +303,12 @@
         <datalist id="tags">
             {% for tag in tags %}
             <option value="{{tag}}">
-            {% endfor %}
+                {% endfor %}
         </datalist>
         <button class="tag_search_submit" type="submit" hover-content="Apply">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-check">
                 <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
         </button>
