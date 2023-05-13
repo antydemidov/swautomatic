@@ -34,6 +34,7 @@ You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
 - Flask - 2.2.3
 - Flask-WTF - 1.0.1
 - jsonschema - 4.17.3
+- Pillow - 9.4.0
 - pymongo - 4.3.3
 - python-decouple - 3.8
 - python-dotenv - 0.21.0

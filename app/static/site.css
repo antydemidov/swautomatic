@@ -192,6 +192,7 @@ button:hover::after,
     padding: 5px 10px;
     position: absolute;
     width: max-content;
+    z-index: 1;
 }
 
 .navbar {

@@ -36,7 +36,7 @@ def library():
     if per_page_form.per_page_selector.data:
         per_page = int(per_page_form.per_page_selector.data)
 
-    tags = [tag['tag'] for tag in list(tags_coll.find({}))]
+    tags = sorted([tag['tag'] for tag in list(tags_coll.find({}))])
     tags_form = TagsForm(request.form)
     selected_tag = tags_form.tag_choices.data or tag_name or request.form.get('tag')
     fltr = {}
@@ -44,11 +44,16 @@ def library():
         tag = tags_coll.find_one({'tag': selected_tag})
         fltr.update({'tags': tag['tag']})
     # Update status
-    if request.form.get('update_database', 'false') == 'true':
+    if request.form.get('check_updates', 'false') == 'true':
         swa_object.check_updates()
     # DANGER ZONE FULL UPDATE
-    if request.form.get('reload_database', 'false') == 'true':
+    if request.form.get('total_reset', 'false') == 'true':
+        # swa_object.total_reset()
         pass
+    if request.form.get('update_tags', 'false') == 'true':
+        swa_object.update_tags()
+    if request.form.get('update_database', 'false') == 'true':
+        swa_object.update_database()
 
     if need_upd:
         fltr.update({'need_update': True})
@@ -106,19 +111,20 @@ def library_page(steam_id):
     if request.form.get('update_asset', 'false') == 'true':
         asset.update_record()
 
-    asset_details = asset.to_dict()
-    asset_details['preview_path'] = url_for('previews', assetid=steam_id)
-    asset_details['file_size'] = get_size_format(asset_details['file_size'])
-    asset_details['tags'] = asset.tags if asset.tags is not None else [
-        'No tags']
+    preview_path = url_for('previews', assetid=steam_id)
+    file_size = get_size_format(asset.file_size)
     files = {}
     i = 1
     for key, value in asset.get_files().items():
         files.update({key: {'id': i, 'size': get_size_format(value)}})
         i += 1
-    asset_details['files'] = files.items()
+    files = files.items()
     return render_template('library_page.html',
-                           asset_details=asset_details)
+                           asset=asset,
+                           preview_path=preview_path,
+                           file_size=file_size,
+                           files=files,
+                           )
 
 
 @app.route('/about')
@@ -134,13 +140,12 @@ def about():
 
 @app.route('/previews/<assetid>')
 def previews(assetid):
-    path = None
+    path = 'empty.jpg'
     assetid = str(assetid)
     for file in os.listdir(settings.previews_path):
         if assetid in file:
             path = file
-    if path:
-        return send_from_directory(f'../{settings.previews_path}', path)
+    return send_from_directory(f'../{settings.previews_path}', path)
 
 
 @app.route('/settings', methods=['GET', 'POST'])

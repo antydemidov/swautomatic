@@ -29,7 +29,7 @@ def get_author_data(author_steamid):
             text = None
             if value:
                 text = value.text
-            data.update({field: text})
+            data.update({settings.mapping_fields[field]: text})
     return data
 
 

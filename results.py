@@ -10,17 +10,14 @@ class CommonResult:
 
     ### Attributes
     - `status` (str): A string representating a status of running.
-    - `status_bool` (bool): Boolean variant of status.
-    - `details` (dict): A dictionary containing detatils of running."""
+    - `status_bool` (bool): Boolean variant of status."""
     def __init__(
         self,
         status: str = '',
         status_bool: bool = True,
-        details: dict = None,
         **kwargs
     ):
         self.status = status
         self.status_bool = status_bool
-        self.details = details
         for key, value in kwargs.items():
             setattr(self, key, value)

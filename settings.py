@@ -1,4 +1,4 @@
-"""#Steam Workshop Automatic Settings
+"""# Swautomatic > `Settings`
 The SWASettings module provides a class named `SWASettings` which is used to
 store the settings of a project. It contains various attributes to store
 settings related to the database, file paths, URLs, and timeout.
@@ -35,10 +35,10 @@ UTF8 = 'utf-8'
 config = Config()
 
 class SWASettings:
-    """# Class `SWASettings`
+    """## Swautomatic > Settings > `SWASettings`
     The object used to store settings of the project.
 
-    ## Attributes:
+    ### Attributes
     - `host` : str - representing the hostname of the MongoDB server. This is
     read from the `HOST` environment variable or the `settings.json` file if
     it is defined there.
@@ -72,17 +72,17 @@ class SWASettings:
     - `previews_path`: str - representing the path to the directory containing
     preview images.
     - `steam_api_url`: str - representing the URL of the Steam API.
-    - `needed_fields`: list - of strings representing the fields that are required
-    for a document.
+    - `needed_fields`: list - of strings representing the fields that are
+    required for a document.
     - `uri`: str - representing the connection URI for the MongoDB database.
-    - `timeout`: float - representing the number of seconds to wait for a request.
-    This is set to 15 by default.
-    - `longtimeout`: float - representing the number of seconds to wait for a request.
-    This is set to 60 by default.
+    - `timeout`: float - representing the number of seconds to wait for a
+    request. This is set to 15 by default.
+    - `longtimeout`: float - representing the number of seconds to wait for a
+    request. This is set to 60 by default.
     - `per_page`:  int - representing the number of assets shown per page.
     This is set to 20 by default.
 
-    ## Methods:
+    ### Methods
     - `update(self, key, value)`: A method that updates the value of an attribute
     in the `settings.json` file and in the instance variables of the class. It
     receives the key and value of the attribute as parameters and writes the new
@@ -92,14 +92,20 @@ class SWASettings:
         try:
             with open('settings.json', 'r', encoding=UTF8) as file:
                 settings: dict = json.load(file)
-        except FileNotFoundError('Check the file settings.json') as error:
+        except FileNotFoundError('Check the file settings.json') as error: # type: ignore
             raise error
 
         self.app_path: str = settings.get('app_path', '')
         self.appid: int = settings.get('appid', 0)
         self.asset_url: str = settings.get('asset_url', '')
         self.authmechanism: str = settings.get('authmechanism', '')
-        self.author_needed_fields: list = ['steamID64', 'steamID', 'avatarIcon', 'avatarMedium', 'avatarFull', 'customURL']
+        self.author_needed_fields: list = ['steamID64',
+                                           'steamID',
+                                           'avatarIcon',
+                                           'avatarMedium',
+                                           'avatarFull',
+                                           'customURL',
+                                           ]
         self.authsource: str = settings.get('authsource', '')
         self.common_path: str = settings.get('common_path', '')
         self.database_name: str = settings.get('database_name', '')
@@ -128,6 +134,15 @@ class SWASettings:
         params = f'?authMechanism={self.authmechanism}&authSource={self.authsource}'
         self.uri = f'{url}@{auth}/{params}'
 
+        self.mapping_fields = {
+            'steamID64': 'steam_id64',
+            'steamID': 'steam_id',
+            'avatarIcon': 'avatar_icon',
+            'avatarMedium': 'avatar_medium',
+            'avatarFull': 'avatar_full',
+            'customURL': 'custom_url',
+        }
+
     # ChatGPT: It might be more efficient to read in the JSON data once and
     # store it as an attribute, then modify that data directly and write it
     # back out only when necessary.
@@ -149,6 +164,6 @@ class SWASettings:
             with open('settings.json', 'w', encoding=UTF8) as file:
                 file.write(json.dumps(settings))
             setattr(self, key, value)
-        except FileNotFoundError('Check the file settings.json') as error:
+        except FileNotFoundError('Check the file settings.json') as error: # type: ignore
             raise error
         # return self

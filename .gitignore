@@ -129,11 +129,7 @@ dmypy.json
 .pyre/
 
 # Other files
-errors.txt
 .vscode/
-assets/
-example/
-mods/
-previews/
-main.ipynb
+previews/*
+!previews/empty.jpg
 _main.ipynb

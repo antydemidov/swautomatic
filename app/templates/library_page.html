@@ -2,7 +2,7 @@
 
 {% block content %}
 <script>
-    function hide_show() {
+    function show_loader() {
         var div = document.getElementById("loader").style.display;
         if (div == "") div = "none";
         if (div == "none") { div = "block"; } else { div = "none"; }
@@ -27,15 +27,15 @@
 </div>
 
 <div class="library_page_head shadow rounded_block">
-    <img src="{{ asset_details['preview_path'] }}">
-    <h1>{{ asset_details['name'] }}</h1>
+    <img src="{{ preview_path }}">
+    <h1>{{ asset.name }}</h1>
 </div>
 
 <div class="library_page_underhead shadow rounded_block">
     <form class="library_page_toolbar" method="post">
-        {% if asset_details['need_update'] == True %}
-        <button name="download_asset" value="true" type="submit" hover-content="Download asset" formmethod="post"
-            onClick="hide_show();">
+        {% if asset.need_update == True %}
+        <button name="download_asset" value="true" type="submit" hover-content="Update asset" formmethod="post"
+            onClick="show_loader();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="feather feather-refresh-cw">
@@ -44,7 +44,7 @@
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
         </button>
-        {% elif asset_details['is_installed'] == True %}
+        {% elif asset.is_installed == True %}
         <button name="downloaded_asset" value="False" type="button" style="cursor:not-allowed"
             hover-content="Asset is downloaded">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -55,7 +55,7 @@
         </button>
         {% else %}
         <button name="download_asset" value="true" type="submit" hover-content="Download asset" formmethod="post"
-            onClick="hide_show();">
+            onClick="show_loader();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-download"
                 viewBox="0 0 24 24">
@@ -65,8 +65,8 @@
             </svg>
         </button>
         {% endif %}
-        <button class="library_toolbar_item" type="submit" hover-content="Coming soon!" value="true" name="update_asset"
-            onClick="hide_show();">
+        <button class="library_toolbar_item" type="submit" hover-content="Update record" value="true" name="update_asset"
+            onClick="show_loader();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
                 <polyline points="23 4 23 10 17 10"></polyline>
@@ -74,7 +74,7 @@
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
         </button>
-        <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!">
+        <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!" action="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="feather feather-trash-2">
@@ -87,42 +87,42 @@
         <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!"></button>
     </form>
     <div class="library_page_author">
-        <img class="button" src="{{ asset_details['author']['avatar_icon'] }}">
-        <p>{{ asset_details['author']['steam_id'] }}</p>
+        <img class="button" src="{{ asset.author.avatar_icon }}">
+        <p>{{ asset.author.steam_id }}</p>
     </div>
 </div>
 <div class="library_page_content">
     <table class="library_page_table shadow rounded_block">
         <tr>
             <th>Steam ID</th>
-            <td>{{ asset_details['steamid'] }}</td>
+            <td>{{ asset.steamid }}</td>
         </tr>
         <tr>
             <th>Tags</th>
             <td>
-                {% for tag in asset_details['tags'] %}
+                {% for tag in asset.tags %}
                 <a href="{{ url_for('library', tag=tag.tag) }}">{{ tag.tag }}</a>
                 {% endfor %}
             </td>
         </tr>
         <tr>
             <th>File size</th>
-            <td>{{ asset_details['file_size'] }}</td>
+            <td>{{ file_size }}</td>
         </tr>
         <tr>
             <th>Time created</th>
-            <td>{{ asset_details['time_created'] }}</td>
+            <td>{{ asset.time_created }}</td>
         </tr>
         <tr>
             <th>Time updated</th>
-            <td>{{ asset_details['time_updated'] }}</td>
+            <td>{{ asset.time_updated }}</td>
         </tr>
     </table>
     <div class="library_page_requirements shadow rounded_block"></div>
 </div>
 <div class="library_page_files shadow rounded_block">
     <table class="library_page_files_table">
-        {% for path, data in asset_details['files'] %}
+        {% for path, data in files %}
         <tr>
             <th>{{data['id']}}</th>
             <td>{{path}}</td>
