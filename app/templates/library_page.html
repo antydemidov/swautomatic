@@ -32,7 +32,7 @@
 </div>
 
 <div class="library_page_underhead shadow rounded_block">
-    <form class="library_page_toolbar" method="post">
+    <form class="library_page_toolbar" method="post" action="{{ url_for('library_page', steam_id=asset.steamid) }}">
         {% if asset.need_update == True %}
         <button name="download_asset" value="true" type="submit" hover-content="Update asset" formmethod="post"
             onClick="show_loader();">
@@ -74,7 +74,7 @@
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
         </button>
-        <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!" action="#">
+        <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="feather feather-trash-2">

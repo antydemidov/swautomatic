@@ -4,7 +4,7 @@ from flask import render_template, request, send_from_directory, url_for
 from app import app
 from connection import assets_coll, tags_coll, settings
 from forms import SettingsForm, TagsForm, PerPageForm
-from SWA_api import SWAAsset, SWAObject
+from swa_api import SWAAsset, SWAObject
 from utils import get_size_format
 
 swa_object = SWAObject()
@@ -35,6 +35,8 @@ def library():
     per_page_form = PerPageForm(request.form)
     if per_page_form.per_page_selector.data:
         per_page = int(per_page_form.per_page_selector.data)
+        if per_page != settings.per_page:
+            settings.update('per_page', per_page)
 
     tags = sorted([tag['tag'] for tag in list(tags_coll.find({}))])
     tags_form = TagsForm(request.form)
