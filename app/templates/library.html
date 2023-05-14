@@ -138,7 +138,7 @@
 <!-- Danger Zone window -->
 <div class="danger_zone shadow" id="danger_zone">
     <h3>Danger Zone!</h3>
-    <form action="#" method="post">
+    <form action="{{url_for('library')}}" method="post">
         <button class="library_toolbar_item" type="submit" name="total_reset" value="true" onclick="show_loader();"
             hover-content="Reload database">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -158,7 +158,7 @@
 <!-- Assets Collection -->
 <div class="library_card_collection" id="library_card_collection">
     {% for asset in datalist %}
-    <a class="library_card shadow" href="{{ url_for('library_page', steam_id = asset['steamid']) }}">
+    <a class="library_card shadow" href="{{ url_for('library_page', steam_id=asset['steamid']) }}">
         <img src="{{ url_for('previews', assetid=asset['steamid']) }}">
         <p>{{ asset['name'] }}</p>
         {% if asset['is_installed'] %}
@@ -192,10 +192,10 @@
 </div>
 
 <!-- Library Toolbar -->
-<form class="library_toolbar shadow rounded_block" method="post">
+<form class="library_toolbar shadow rounded_block" method="post" action="{{url_for('library')}}">
     <!-- Update tags -->
     <button class="library_toolbar_item" type="submit" name="update_tags" value="true" onclick="show_loader();"
-        hover-content="Update tags" action="#">
+        hover-content="Update tags">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="feather feather-repeat">
@@ -207,7 +207,7 @@
     </button>
     <!-- Update status -->
     <button class="library_toolbar_item" type="submit" name="check_updates" value="true" onclick="show_loader();"
-        hover-content="Update status of all assets" action="#">
+        hover-content="Update status of all assets">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="feather feather-refresh-cw">
@@ -218,7 +218,7 @@
     </button>
     <!-- Update the database -->
     <button class="library_toolbar_item" type="submit" name="update_database" value="true" onclick="show_loader();"
-        hover-content="Update data of all assets" action="#">
+        hover-content="Update data of all assets">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="feather feather-database">
@@ -253,8 +253,8 @@
         </svg>
     </button>
     <!-- Button showing only assets which need update -->
-    <button class="library_toolbar_item" type="submit" value="{{ no_show_need_upd }}" name="show_need_upd" action="{{
-        url_for('library', tag=selected_tag, p=page_num, pp=per_page, show_need_upd=no_show_need_upd) }}"
+    <button class="library_toolbar_item" type="submit" value="{{ no_show_need_upd }}" name="show_need_upd"
+        formaction="{{url_for('library', tag=selected_tag, p=page_num, show_need_upd=no_show_need_upd) }}"
         hover-content="Show need update">
         {% if show_need_upd == 1 %}
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
