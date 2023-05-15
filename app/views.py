@@ -3,11 +3,13 @@ import os
 
 from flask import render_template, request, send_from_directory, url_for
 
-from . import app
-from .forms import PerPageForm, SettingsForm, TagsForm
 from swautomatic import SWAAsset, SWAObject
 from swautomatic.connection import _assets_coll, _settings, _tags_coll
+from swautomatic.tag import SWATag
 from swautomatic.utils import get_size_format
+
+from . import app
+from .forms import PerPageForm, SettingsForm, TagsForm
 
 swa_object = SWAObject()
 
@@ -45,8 +47,8 @@ def library():
     selected_tag = tags_form.tag_choices.data or tag_name or request.form.get('tag')
     fltr = {}
     if selected_tag:
-        tag = _tags_coll.find_one({'tag': selected_tag})
-        fltr.update({'tags': tag['tag']})
+        tag = SWATag(selected_tag)
+        fltr.update({'tags': tag.tag})
     # Update status
     if request.form.get('check_updates', 'false') == 'true':
         swa_object.check_updates()
@@ -162,7 +164,7 @@ def settings_page():
 
     if request.method == 'POST':
         path = form.common_path.data
-        data = form.data
+        # data = form.data
 
     return render_template('settings.html',
                            title=title,

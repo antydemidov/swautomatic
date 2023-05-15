@@ -18,13 +18,15 @@ class SWAPreview:
 
     ### Attributes:
     - `url` (str): The URL of the preview image.
-    - `path` (str): The path to the local file where the preview image is stored.
-    - `format` (str): The file format of the preview image.
+    - `steam_id` (int): The Steam Workshop ID of the item to which this preview
+    image belongs.
 
     ### Methods:
     - `download()`:
     Downloads the file from `self.url`, saves it to `self.path` and checks if
     the size of the downloaded file is equal to the expected Content-Length.
+    - `downloaded()`:
+    Checks if the preview is downloaded.
 
     ### Parameters:
     - `steam_id` (int): The Steam Workshop ID of the item to which this preview
@@ -72,7 +74,7 @@ class SWAPreview:
         # make better use of the available network bandwidth and improve overall
         # download speed. The concurrent.futures module provides a
         # ThreadPoolExecutor class that you could use for this.
-        #
+
         # Use asynchronous I/O: If you're downloading a large number of preview
         # images, using asynchronous I/O could be more efficient than using a
         # thread pool. You could use a library like asyncio to implement this.
@@ -100,24 +102,8 @@ class SWAPreview:
             # Return the size of the downloaded image file
             return os.path.getsize(path)
 
-        except FileNotFoundError as error:
-            logging.critical(
-                'The file for asset %s cannot be found', self.steam_id)
-            logging.exception(error)
-        except ValueError as error:
+        except (FileNotFoundError, ValueError, TypeError,
+                UnidentifiedImageError, AttributeError) as error:
             logging.error(
-                'ValueError occurred while downloading asset %s', self.steam_id)
-            logging.exception(error)
-        except TypeError as error:
-            logging.error(
-                'TypeError occurred while downloading asset %s', self.steam_id)
-            logging.exception(error)
-        except UnidentifiedImageError as error:
-            logging.critical(
-                'The image for asset %s cannot be opened and identified', self.steam_id)
-            logging.exception(error)
-        except AttributeError as error:
-            logging.error(
-                'AttributeError occurred while downloading asset %s', self.steam_id)
-            logging.exception(error)
+                'The error occured. SteamID: %s. %s', self.steam_id, repr(error))
         return 0

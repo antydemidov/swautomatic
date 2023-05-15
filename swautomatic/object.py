@@ -16,16 +16,10 @@ from pymongo import UpdateOne
 
 from swautomatic.author import SWAAuthor
 
-from . import (CommonResult, SWAAsset, _assets_coll, _client, _settings,
-               _tags_coll, get_directory_size, get_size_format)
+from . import (DFLT_DATE, CommonResult, SWAAsset, _assets_coll, _client,
+               _settings, _tags_coll, get_directory_size, get_size_format)
 
-url_parts = ['cw03361255710','cw85745255710','ca40929255710','ci03361255710']
-base_links = [f'https://cdn.ggntw.com/{i}/' for i in url_parts] + [
-    f'https://cdn.steamworkshopdownloader.ru/{i}/' for i in url_parts] + [
-        'http://workshop.abcvg.info/archive/255710/'] + [
-            f'http://workshop{i+1}.abcvg.info/archive/255710/' for i in range(9)]
 
-DFLT_DATE = datetime.fromordinal(1)
 log_filename = f"logs/{datetime.today().isoformat(timespec='seconds')}_swa_api.log"
 logging.basicConfig(level=logging.INFO,
                     filename=log_filename,
@@ -35,16 +29,18 @@ logging.basicConfig(level=logging.INFO,
 
 class SWAObject:
     """## Swautomatic > SWA_api > `SWAObject`
-    The main object of Swautomatic project.
+        The main object of Swautomatic project.
 
     ### Attributes
-    - `client` (pymongo.MongoClient): A MongoDB client object.
-    - `settings` (SWASettings): An object representing Swautomatic settings.
+        - `client` (pymongo.MongoClient): A MongoDB client object.
+        - `settings` (SWASettings): An object representing Swautomatic settings.
 
     ### Methods
-    - `get_asset()`: Retrieves a SWAAsset object for the specified asset steam ID.
-    - `get_statistics()`: The method returns a CommonResult object that
-    contains the retrieved statistics"""
+        - `get_asset()`: Retrieves a SWAAsset object for the specified asset
+          steam ID.
+        - `get_statistics()`: The method returns a CommonResult object that
+          contains the retrieved statistics.
+    """
 
     def __init__(self):
         self.client = _client
@@ -52,35 +48,37 @@ class SWAObject:
 
     def get_asset(self, steam_id: int):
         """### Swautomatic > SWA_api > SWAObject.`get_asset()`
-        Retrieves a SWAAsset object for the specified asset steam ID.
+            Retrieves a SWAAsset object for the specified asset steam ID.
 
         #### Parameters
-        - steam_id (int): The steam ID of the asset.
+            - `steam_id` (int): The steam ID of the asset.
         
         #### Return
-        - SWAAsset: The SWAAsset object representing the asset."""
+            The SWAAsset object representing the asset.
+        """
         return SWAAsset(steam_id, swa_object=self)
 
     def get_assets(self, steam_ids: list | None = None, skip: int = 0, limit: int = 0):
         """### Swautomatic > SWA_api > SWAObject.`get_assets()`
 
-        Retrieves a list of SWAAsset objects based on the provided parameters.
+            Retrieves a list of SWAAsset objects based on the provided parameters.
 
-        !!! It works only with assets in database. Assets which not exists
-        will be empty.
+            !!! It works only with assets in database. Assets which not exists
+            will be empty.
 
-        #### Example:
-        >>> swa_object = SWAObject()
-        >>> swa_object.get_assets([123, 321])
-        ... [SWAAsset(asset_id=123), SWAAsset(asset_id=321)]
+        #### Example::
+
+            swa_object = SWAObject()
+            swa_object.get_assets([123, 321])
 
         #### Parameters:
-        - steam_ids: `list` - a list of assets steam ids;
-        - skip: `int` - a number of records to skip;
-        - limit: `int` - a number of records to show.
+            - `steam_ids` (list): a list of assets steam ids.
+            - `skip` (integer): a number of records to skip.
+            - `limit` (integer): a number of records to show.
         
         #### Return
-        A list of SWAAsset objects."""
+            A list of SWAAsset objects.
+        """
 
         if not steam_ids:
             data = _assets_coll.find({}, skip=skip, limit=limit)
@@ -91,26 +89,27 @@ class SWAObject:
 
     def get_statistics(self):
         """### Swautomatic > SWA_api > SWAObject.`get_statistics()`
-
-        Retrieves statistics about the database and returns a CommonResult object.
+            Retrieves statistics about the database and returns a CommonResult
+            object.
 
         #### Return
-        `CommonResult`: The retrieved statistics including the following attributes:
-            - count (`int`): The total number of assets in the database.
-            - count_by_tag (`list`): A list of dictionaries containing
-            information about the count of assets by tag. Each dictionary
-            has the following attributes:
-                - tag_id (`str`): The unique identifier of the tag.
-                - tag_name (`str`): The name of the tag.
-                - count (`int`): The count of assets that have the tag.
-            - installed (`int`): The count of installed assets.
-            - not_installed (`int`): The count of not installed assets.
-            - assets_size (`str`): The size of the assets directory in
-            human-readable format.
-            - mods_size (`str`): The size of the mods directory in
-            human-readable format.
-            - total_size (`str`): The total size of assets and mods
-            directories combined in human-readable format.
+            - `CommonResult`: The retrieved statistics including the following
+              attributes:
+                - `count` (int): The total number of assets in the database.
+                - `count_by_tag` (list): A list of dictionaries containing
+                  information about the count of assets by tag. Each dictionary
+                  has the following attributes:
+                    - `tag_id` (str): The unique identifier of the tag.
+                    - `tag_name` (str): The name of the tag.
+                    - `count` (int): The count of assets that have the tag.
+                - `installed` (int): The count of installed assets.
+                - `not_installed` (int): The count of not installed assets.
+                - `assets_size` (str): The size of the assets directory in
+                  human-readable format.
+                - `mods_size` (str): The size of the mods directory in
+                  human-readable format.
+                - `total_size` (str): The total size of assets and mods
+                  directories combined in human-readable format.
         """
 
         # Add an aggregation here, now it has a loop with a lot of tags
@@ -145,29 +144,29 @@ class SWAObject:
 
     def close(self):
         """### Swautomatic > SWA_api > SWAObject.`close()`
-
-        Closes the database client.
+            Closes the database client.
         """
         self.client.close()
 
     # UPDATE
     def update_tags(self):
         """### Swautomatic > SWA_api > SWAObject.`update_tags()`
-
             Update the tags from Steam Community by deleting outdated documents
             in the collection before updating.
-        
+
         #### Return
-        - `CommonResult`: An object containing the status of the update operation.
+            - `CommonResult`: An object containing the status of the update
+              operation.
 
         #### Raises
-        - `RequestException`: If there is an error in the HTTP request.
-        - `ValueError`: If there is a value error during the execution.
+            - `RequestException`: If there is an error in the HTTP request.
+            - `ValueError`: If there is a value error during the execution.
         """
 
         try:
-            response = rq.get('https://steamcommunity.com/app/255710/workshop/',
-                              timeout=_settings.timeout)
+            response = rq.get(
+                'https://steamcommunity.com/app/255710/workshop/',
+                timeout=_settings.timeout)
             soup = bs(response.content, 'html.parser')
             tags_soup = soup.find_all('label', 'tag_label')
             tags_at_steam = [' '.join(re.findall(r'\S+', tag.text)[:-1])
@@ -196,7 +195,6 @@ class SWAObject:
                                 inserted_tags=tags_to_upd,
                                 )
         except (rq.RequestException, ValueError) as error:
-            # Handle the request exception or value error
             logging.critical('The tags could not be updated. %s', error)
             return CommonResult(status='Error',
                                 status_bool=False,
@@ -206,14 +204,15 @@ class SWAObject:
     @staticmethod
     def steam_api_data(ids: list) -> dict[str, dict]:
         """### Swautomatic > SWA_api > SWAObject.`steam_api_data()`
-        Returns data about assets and mods from Steam API.
+            Returns data about assets and mods from Steam API.
 
         #### Parameters
-        - ids (`list`): A list of asset IDs.
+            - `ids` (list): A list of asset IDs.
 
         #### Return
-        - `dict`: A dictionary containing data about assets and mods from the
-        Steam API."""
+            A dictionary containing data about assets and mods from
+            the Steam API.
+        """
 
         post_data = {'itemcount': len(ids)}
         post_data.update(
@@ -239,13 +238,9 @@ class SWAObject:
 
     def check_updates(self):
         """### Swautomatic > SWA_api > SWAObject.`check_updates()`
-
-        Checks for updates of the assets and mods, and updates the database
-        accordingly. It uses the `~swautomatic.SWA_api.SWAObject.steam_api_data().`
-        method.
-
-        #### Return
-            None
+            Checks for updates of the assets and mods, and updates the database
+            accordingly. It uses the `~swautomatic.SWA_api.SWAObject.steam_api_data()`
+            method.
         """
 
         ids = [id['steamid'] for id in _assets_coll.find(
@@ -276,15 +271,15 @@ class SWAObject:
 
     def info_steam(self, ids: list):
         """### Swautomatic > SWA_api > SWAObject.`info_steam()`
-        Returns the formated dictionary with the data from Steam. It uses
-        `~swautomatic.SWA_api.SWAObject.steam_api_data()`.
+            Returns the formated dictionary with the data from Steam. It uses
+            `~swautomatic.SWA_api.SWAObject.steam_api_data()`.
 
         #### Parameters
-        - ids (`list`): A list of asset IDs.
+            - `ids` (list): A list of asset IDs.
 
         #### Return
-        - `dict`: A dictionary containing the formatted Steam data for the
-        assets."""
+            A dictionary containing the formatted Steam data for the assets.
+        """
 
         data = {}
         steam_data = self.steam_api_data(ids)
@@ -326,7 +321,6 @@ class SWAObject:
 
                 # === is_installed ===
                 is_installed = os.path.exists(path)
-                # is_installed = self.installed(steam_id)
 
                 # === time_local ===
                 time_local = DFLT_DATE
@@ -377,20 +371,22 @@ class SWAObject:
     @staticmethod
     def ids_database() -> set[int]:
         """### Swautomatic > SWA_api > SWAObject.`ids_database()`
-        Returns a set of Steam IDs of assets stored in the database.
+            Returns a set of Steam IDs of assets stored in the database.
 
         #### Return
-        - `set[int]`: A set of Steam IDs."""
+            A set of Steam IDs.
+        """
 
         return set(int(asset['steamid']) for asset in _assets_coll.find(
             {}, projection={'steamid': True}))
 
     def ids_steam(self) -> set[int]:
         """### Swautomatic > SWA_api > SWAObject.`ids_steam()`
-        Returns a set of Steam IDs of assets stored in the user's Steam favorites.
+            Returns a set of Steam IDs of assets stored in the user's Steam
+            favorites.
 
         #### Return
-        - `set[int]`: A set of Steam IDs.
+            A set of Steam IDs.
         """
 
         i = 1
@@ -424,11 +420,11 @@ class SWAObject:
 
     def ids_local(self) -> set[int]:
         """### Swautomatic > SWA_api > SWAObject.`ids_local()`
-        Returns a set of Steam IDs of installed assets and mods on the local
-        machine.
+            Returns a set of Steam IDs of installed assets and mods on the
+            local machine.
 
         #### Return
-        - `set[int]`: A set of Steam IDs.
+            A set of Steam IDs.
         """
 
         asset_ids = set()
@@ -446,14 +442,15 @@ class SWAObject:
 
     def total_reset(self):
         """### Swautomatic > SWA_api > SWAObject.`total_reset()`
-        DANGEROUS!!! Deletes all records in the assets collection in the database.
-        Deletes all previews and assets.
+            DANGEROUS!!! Deletes all records in the assets collection in the
+            database. Deletes all previews and assets.
 
         #### Result
-        - `dict`: A dictionary containing information about the reset operation.
-            - size (int): sum of assets' sizes;
-            - assets_count (int): count of deleted assets;
-            - previews_count (int): count of deleted previews."""
+            A dictionary containing information about the reset operation.
+            - `size` (integer): sum of assets` sizes.
+            - `assets_count` (integer): count of deleted assets.
+            - `previews_count` (integer): count of deleted previews.
+        """
 
         size = 0
         ids_local = self.ids_local()
@@ -468,7 +465,7 @@ class SWAObject:
                 str(error))
         # Remove all previews
         preview_files = [entry.name for entry in os.scandir(
-            _settings.previews_path) if entry.is_file() and entry.name != 'epty.jpg']
+            _settings.previews_path) if entry.is_file() and entry.name != 'empty.jpg']
         for preview_file in preview_files:
             try:
                 os.remove(os.path.join(_settings.previews_path, preview_file))
@@ -496,11 +493,11 @@ class SWAObject:
 
     def update_database(self):
         """### Swautomatic > SWA_api > SWAObject.`update_database()`
-
-        Updates the database by performing operations for deleting, updating,
-        and inserting assets. It also downloads the previews for newly inserted
-        assets. The function uses MongoDB transactions for ensuring data
-        consistency."""
+            Updates the database by performing operations for deleting,
+            updating, and inserting assets. It also downloads the previews for
+            newly inserted assets. The function uses MongoDB transactions for
+            ensuring data consistency.
+        """
 
         try:
             ids_steam = self.ids_steam()
@@ -514,7 +511,8 @@ class SWAObject:
             updated_count = self.__update_assets(ids_to_update)
             inserted_count = self.__insert_assets(ids_to_insert)
 
-            logging.info('The database updated')
+            logging.info('The database updated, d: %s, u: %s, i: %s',
+                         deleted_count, updated_count, inserted_count)
             return CommonResult(
                 status='Done',
                 status_bool=True,
@@ -529,10 +527,10 @@ class SWAObject:
 
     def __delete_assets(self, asset_ids, session=None):
         """### Swautomatic > SWA_api > SWAObject.`__delete_assets()`
-
-        Deletes assets from the database based on the provided asset IDs.
-        It also removes the corresponding old previews associated with the
-        deleted assets."""
+            Deletes assets from the database based on the provided asset IDs.
+            It also removes the corresponding old previews associated with the
+            deleted assets.
+        """
 
         if asset_ids:
             deleted_count = _assets_coll.delete_many(
@@ -548,17 +546,18 @@ class SWAObject:
 
     def __update_assets(self, asset_ids, session=None):
         """### Swautomatic > SWA_api > SWAObject.`__update_assets()`
-
-        Updates assets in the database based on the provided asset IDs. It
-        retrieves the updated data from the Steam API and sends it to the
-        database.
+            Updates assets in the database based on the provided asset IDs. It
+            retrieves the updated data from the Steam API and sends it to the
+            database.
 
         #### Parameters
-        - asset_ids (`list | set`): The IDs of the assets to update.
-        - session (~pymongo.`Session`): The database session to use for updating
-        the assets. (optional, default = `None`).
+            - `asset_ids` (list or set): The IDs of the assets to update.
+            - `session` (~pymongo.`Session`): The database session to use for
+              updating the assets. (optional, default = `None`).
+
         #### Return
-        The number of assets that were updated, rtype: `int`."""
+            The number of assets that were updated, rtype: `int`.
+        """
 
         updated_count = 0
         if asset_ids:
@@ -585,12 +584,11 @@ class SWAObject:
 
     def __insert_assets(self, asset_ids, session=None):
         """### Swautomatic > SWA_api > SWAObject.`__insert_assets()`
+            Inserts new assets into the database based on the provided asset
+            IDs. It retrieves the asset data from the Steam API and inserts it
+            into the database collection.
+        """
 
-        Inserts new assets into the database based on the provided asset IDs.
-        It retrieves the asset data from the Steam API and inserts it into the
-        database collection."""
-
-        # TODO: Add logging here. Closes #18
         inserted_count = 0
         if asset_ids:
             new_data = self.info_steam(list(asset_ids))
@@ -605,12 +603,11 @@ class SWAObject:
 
     def __remove_old_previews(self, asset_ids):
         """### Swautomatic > SWA_api > SWAObject.`__remove_old_previews()`
+            Removes the old previews associated with the specified asset IDs.
+            It searches for files in the previews directory that contain the
+            asset IDs and deletes those files.
+        """
 
-        Removes the old previews associated with the specified asset IDs. It
-        searches for files in the previews directory that contain the asset
-        IDs and deletes those files."""
-
-        # TODO: Add logging here. Closes #18
         previews_dir = os.listdir(_settings.previews_path)
         for asset_id in asset_ids:
             files = [os.path.join(_settings.previews_path, file)
@@ -621,10 +618,11 @@ class SWAObject:
 
     def __remove_assets(self, asset_ids: list[int] | set[int]) -> int:
         """### Swautomatic > SWA_api > SWAObject.`__remove_assets()`
-        Removes assets
+            Removes assets.
         
         #### Return
-            `int` - size of deleted assets."""
+            A size of deleted assets (integer).
+        """
 
         size = 0
         for asset_id in asset_ids:
@@ -644,7 +642,8 @@ class SWAObject:
 
     def __delete_directory(self, path):
         """### Swautomatic > SWA_api > SWAObject.`__delete_directory()`
-        Removes the directory with given `path`."""
+            Removes the directory with given `path`.
+        """
         try:
             shutil.rmtree(path)
             logging.info('Deleted directory: %s', path)
@@ -656,7 +655,8 @@ class SWAObject:
 
     def update_asset(self, asset_ids: list | set, skip: int = 0, limit: int = 0):
         """### Swautomatic > SWA_api > SWAObject.`update_asset()`
-        If the preview is not downloaded downloads it, updates the asset."""
+            If the preview is not downloaded downloads it, updates the asset.
+        """
         assets = self.get_assets(list(asset_ids), skip, limit)
         for asset in assets:
             if not asset.preview.downloaded():
@@ -670,12 +670,13 @@ class SWAObject:
 
     def installed(self, steam_id):
         """### Swautomatic > SWA_api > SWAObject.`installed()`
-        This method takes a `steam_id` as input and returns a boolean value
-        indicating whether the corresponding asset or mod is installed on the
-        local machine.
+            This method takes a `steam_id` as input and returns a boolean value
+            indicating whether the corresponding asset or mod is installed on
+            the local machine.
 
         #### Return
-        - `bool` representating installed asset or not installed."""
+            A boolean representating installed asset or not installed.
+        """
 
         asset_path = os.path.join(_settings.assets_path, str(steam_id))
         mod_path = os.path.join(_settings.mods_path, str(steam_id))

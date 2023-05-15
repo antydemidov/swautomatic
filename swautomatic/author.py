@@ -4,18 +4,21 @@ Module for class `SWAAuthor`.
 """
 
 import logging
-from bs4 import BeautifulSoup as bs
+
 import requests as rq
+from bs4 import BeautifulSoup as bs
 
 from . import _settings
 
 
 class SWAAuthor:
     """## Swautomatic > SWA_api > `SWAAuthor`
-    Desc
+        Desc.
 
     ### Parameters:
-    **kwargs (dict[str, Unknown]): the data to fill the fields of this object."""
+        - `steamid` (integer): A Steam ID of the author.
+        - `**kwargs` (dict): The data to fill the fields of this object.
+    """
 
     def __init__(self, steamid: int = 0, **kwargs) -> None:
         # validate(kwargs, swa_author_schema)
@@ -32,16 +35,17 @@ class SWAAuthor:
 
     def to_dict(self) -> dict:
         """### Swautomatic > SWA_api > SWAAuthor.`to_dict()`
-        Coverts the object to dictionary.
+            Coverts the object to dictionary.
 
         #### Return
-        - `dict`: desc
-            - `steam_id64` (int): desc;
-            - `steam_id` (str): desc;
-            - `avatar_icon` (str): desc;
-            - `avatar_medium` (str): desc;
-            - `avatar_full` (str): desc;
-            - `custom_url` (str): desc."""
+            A dictionary (desc).
+                - `steam_id64` (int): desc;
+                - `steam_id` (str): desc;
+                - `avatar_icon` (str): desc;
+                - `avatar_medium` (str): desc;
+                - `avatar_full` (str): desc;
+                - `custom_url` (str): desc.
+        """
 
         return {'steam_id64': self.steam_id64,
                 'steam_id': self.steam_id,
@@ -53,11 +57,11 @@ class SWAAuthor:
 
     def get_author_data(self) -> dict:
         """### Swautomatic > SWA_api > SWAAuthor.`get_author_data()`
-        
-        Parse the author page and returns the data in dict.
-        
+            Parse the author page and returns the data in dict.
+
         #### Return
-        - `dict`: A dictionary with a data about the author."""
+            A dictionary with a data about the author.
+        """
         soup = None
         try:
             with rq.get(
@@ -65,7 +69,6 @@ class SWAAuthor:
                     timeout=_settings.timeout) as req:
                 soup = bs(req.content, 'xml')
         except rq.RequestException as error:
-            # TODO: Add an errors catcher. Closes #14
             logging.error(
                 'An error occured for %s: %s',
                 self.steam_id64, str(error))

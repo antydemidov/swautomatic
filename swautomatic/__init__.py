@@ -48,9 +48,9 @@ from .connection import _assets_coll, _client, _db, _settings, _tags_coll
 from .object import SWAObject
 from .preview import SWAPreview
 from .results import CommonResult
-from .settings import SWASettings
+from .settings import DFLT_DATE, SWASettings
 from .tag import SWATag
-from .utils import get_size_format, get_directory_size
+from .utils import get_directory_size, get_size_format
 
 __version__ = 'v0.1'
 __author__ = 'Anton Demidov | @antydemidov'
