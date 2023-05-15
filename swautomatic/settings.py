@@ -26,13 +26,12 @@ from urllib.parse import quote_plus
 
 from jsonschema import ValidationError, validate
 
-from config import Config
+from app.config import Config
 
-__version__ = 'v0.0.1'
-__author__ = 'Anton Demidov | @antydemidov'
 
 UTF8 = 'utf-8'
 config = Config()
+
 
 class SWASettings:
     """## Swautomatic > Settings > `SWASettings`
@@ -88,6 +87,7 @@ class SWASettings:
     receives the key and value of the attribute as parameters and writes the new
     value to the `settings.json` file. It then updates the instance variable with
     the new value."""
+
     def __init__(self) -> None:
         try:
             with open('settings.json', 'r', encoding=UTF8) as file:
