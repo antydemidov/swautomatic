@@ -1,6 +1,6 @@
 # Steam Workshop Automatic
 
-**Current Version:** v0.1
+**Current Version:** `v0.1`
 
 ## Table of Contents
 
@@ -14,6 +14,9 @@
    - [SWASettings](swa_settings.md)
 1. [Result classes](results.md)
 1. App
+   - Views
+   - Forms
+   - Config
    <!-- - [Views]() -->
 
 ## License
