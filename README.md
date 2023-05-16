@@ -21,8 +21,13 @@ Current version: `v0.1`
 
 ## Roadmap
 
-- Detect files from zip files and manage it. Delete extra files.
-- Check requirements of assets and mods.
+### `v0.1`
+
+- [x] [#12](https://github.com/antydemidov/swautomatic/issues/12) Detect files from zip files and manage it. Delete extra files.
+
+### `v2.0`
+
+- [ ] [#13](https://github.com/antydemidov/swautomatic/issues/13) Check requirements of assets and mods.
 
 You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
 
@@ -40,13 +45,9 @@ You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
 - python-dotenv - 0.21.0
 - requests - 2.28.1
 
-## Installation
+## Installation [↩](docs/installation.md)
 
-Read more [here](/docs.md#installation)
-
-## Documentation
-
-Read [here](/docs.md)
+## Documentation [↩](docs/index.md)
 
 ## License
 

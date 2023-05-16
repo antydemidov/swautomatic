@@ -1,11 +1,15 @@
 """Here must be the string"""
 import os
+
 from flask import render_template, request, send_from_directory, url_for
-from app import app
-from connection import assets_coll, tags_coll, settings
-from forms import SettingsForm, TagsForm, PerPageForm
-from swa_api import SWAAsset, SWAObject
-from utils import get_size_format
+
+from swautomatic import SWAAsset, SWAObject
+from swautomatic.connection import _assets_coll, _settings, _tags_coll
+from swautomatic.tag import SWATag
+from swautomatic.utils import get_size_format
+
+from . import app
+from .forms import PerPageForm, SettingsForm, TagsForm
 
 swa_object = SWAObject()
 
@@ -35,16 +39,16 @@ def library():
     per_page_form = PerPageForm(request.form)
     if per_page_form.per_page_selector.data:
         per_page = int(per_page_form.per_page_selector.data)
-        if per_page != settings.per_page:
-            settings.update('per_page', per_page)
+        if per_page != _settings.per_page:
+            _settings.update('per_page', per_page)
 
-    tags = sorted([tag['tag'] for tag in list(tags_coll.find({}))])
+    tags = sorted([tag['tag'] for tag in list(_tags_coll.find({}))])
     tags_form = TagsForm(request.form)
     selected_tag = tags_form.tag_choices.data or tag_name or request.form.get('tag')
     fltr = {}
     if selected_tag:
-        tag = tags_coll.find_one({'tag': selected_tag})
-        fltr.update({'tags': tag['tag']})
+        tag = SWATag(selected_tag)
+        fltr.update({'tags': tag.tag})
     # Update status
     if request.form.get('check_updates', 'false') == 'true':
         swa_object.check_updates()
@@ -68,10 +72,10 @@ def library():
 
     no_need_upd = 0 if need_upd == 1 else 1
 
-    assets_count = assets_coll.count_documents(fltr)
+    assets_count = _assets_coll.count_documents(fltr)
     last_page = assets_count // per_page + 1
     assets_list = [asset['steamid'] for asset in list(
-        assets_coll.find(fltr, limit=per_page, skip=(page_num-1)*per_page))]
+        _assets_coll.find(fltr, limit=per_page, skip=(page_num-1)*per_page))]
     assets_cl_list = swa_object.get_assets(assets_list)
     datalist = []
 
@@ -144,10 +148,10 @@ def about():
 def previews(assetid):
     path = 'empty.jpg'
     assetid = str(assetid)
-    for file in os.listdir(settings.previews_path):
+    for file in os.listdir(_settings.previews_path):
         if assetid in file:
             path = file
-    return send_from_directory(f'../{settings.previews_path}', path)
+    return send_from_directory(f'../{_settings.previews_path}', path)
 
 
 @app.route('/settings', methods=['GET', 'POST'])
@@ -160,7 +164,7 @@ def settings_page():
 
     if request.method == 'POST':
         path = form.common_path.data
-        data = form.data
+        # data = form.data
 
     return render_template('settings.html',
                            title=title,

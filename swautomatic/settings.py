@@ -21,18 +21,19 @@ and writing the settings file and provides an easy-to-use interface for accessin
 and modifying the settings."""
 
 import json
+import logging
 import os
+from datetime import datetime
 from urllib.parse import quote_plus
 
 from jsonschema import ValidationError, validate
 
-from config import Config
+from app.config import Config
 
-__version__ = 'v0.0.1'
-__author__ = 'Anton Demidov | @antydemidov'
-
+DFLT_DATE = datetime.fromordinal(1)
 UTF8 = 'utf-8'
 config = Config()
+
 
 class SWASettings:
     """## Swautomatic > Settings > `SWASettings`
@@ -68,7 +69,6 @@ class SWASettings:
     - `user_url_id`: str - representing the URL of the user's Steam ID.
     - `asset_url`: str - representing the URL of the assets used by the game.
     - `user_favs_url`: str - representing the URL of the user's favorite items.
-    - `links_file_path`: str - representing the path to a file containing links.
     - `previews_path`: str - representing the path to the directory containing
     preview images.
     - `steam_api_url`: str - representing the URL of the Steam API.
@@ -88,11 +88,12 @@ class SWASettings:
     receives the key and value of the attribute as parameters and writes the new
     value to the `settings.json` file. It then updates the instance variable with
     the new value."""
+
     def __init__(self) -> None:
         try:
             with open('settings.json', 'r', encoding=UTF8) as file:
                 settings: dict = json.load(file)
-        except FileNotFoundError('Check the file settings.json') as error: # type: ignore
+        except FileNotFoundError('Check the file settings.json') as error:  # type: ignore
             raise error
 
         self.app_path: str = settings.get('app_path', '')
@@ -109,7 +110,6 @@ class SWASettings:
         self.authsource: str = settings.get('authsource', '')
         self.common_path: str = settings.get('common_path', '')
         self.database_name: str = settings.get('database_name', '')
-        # self.links_file_path: str = settings.get('links_file_path', '')
         self.longtimeout: float = settings.get('longtimeout', 60.0)
         self.needed_fields: list = settings.get('needed_fields', None)
         self.per_page: int = settings.get('per_page', 20)
@@ -127,7 +127,6 @@ class SWASettings:
         self.mods_path = os.path.join(self.common_path, 'Mods')
         if self.app_path == '':
             self.app_path = os.path.abspath(os.path.curdir)
-        # self.links_file_path = os.path.join(self.app_path, 'links.txt')
 
         url = f'mongodb://{quote_plus(config.MONGO_USERNAME)}:{quote_plus(config.MONGO_PASSWORD)}'
         auth = f'{config.HOST}:{config.PORT}'
@@ -158,12 +157,10 @@ class SWASettings:
             try:
                 validate(settings, schema)
             except ValidationError as error:
-                print(f'Your settings is not valid: {str(error)}')
-                # TODO: Add an errors catcher. Closes #14
+                logging.error('Your settings is not valid: %s', repr(error))
 
             with open('settings.json', 'w', encoding=UTF8) as file:
                 file.write(json.dumps(settings))
             setattr(self, key, value)
-        except FileNotFoundError('Check the file settings.json') as error: # type: ignore
+        except FileNotFoundError('Check the file settings.json') as error:  # type: ignore
             raise error
-        # return self
