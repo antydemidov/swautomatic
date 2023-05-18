@@ -11,8 +11,12 @@ from zipfile import ZipFile
 
 import requests as rq
 
-from . import (DFLT_DATE, SWAAuthor, SWAObject, SWAPreview, SWATag,
-               _assets_coll, _settings)
+from .author import SWAAuthor
+from .connection import _assets_coll, _settings
+# from . import SWAObject
+from .preview import SWAPreview
+from .settings import DFLT_DATE
+from .tag import SWATag
 
 url_parts = ['cw03361255710', 'cw85745255710',
              'ca40929255710', 'ci03361255710']
@@ -34,7 +38,7 @@ class SWAAsset:
     #
     # Optimize I/O operations: If you're frequently reading or writing files to
     # disk, you could consider using asynchronous I/O operations to speed up the process.
-    """## Swautomatic > SWA_api > `SWAAsset`
+    """## swautomatic > asset > `SWAAsset`
         A class that represents a Steam Workshop asset or mod, which can be
         downloaded and installed.
 
@@ -77,7 +81,7 @@ class SWAAsset:
                 print("There was an error downloading or installing the asset.")
     """
 
-    def __init__(self, steamid: int | str, swa_object: SWAObject, **kwargs):
+    def __init__(self, steamid: int | str, swa_object, **kwargs):
         self.steamid = int(steamid) # type: ignore
         self.swa_object = swa_object
 
@@ -98,9 +102,9 @@ class SWAAsset:
         self.time_created = info.get('time_created', DFLT_DATE) or DFLT_DATE
         self.time_updated = info.get('time_updated', DFLT_DATE) or DFLT_DATE
         author_data = info.get('author', dict())
-        author_id = int(author_data.get('steam_id', 0))
+        author_id = int(author_data.get('steam_id64', 0))
         if author_data:
-            author_data.pop('steam_id')
+            author_data.pop('steam_id64')
         self.author = SWAAuthor(steamid=author_id,
                                 **author_data)
 
@@ -123,7 +127,7 @@ class SWAAsset:
         self.time_local = time_local
 
     def to_dict(self):
-        """### Swautomatic > SWA_api > SWAAsset.`to_dict()`
+        """### swautomatic > asset > SWAAsset.`to_dict()`
             Transforms object to `dict`.
 
         #### Return
@@ -144,7 +148,7 @@ class SWAAsset:
         return result
 
     def send_to_db(self, session=None):
-        """### Swautomatic > SWA_api > SWAAsset.`send_to_db()`
+        """### swautomatic > asset > SWAAsset.`send_to_db()`
             Sends the record to the database. If the record exists updates it,
             else inserts the new record to the database.
         """
@@ -156,12 +160,12 @@ class SWAAsset:
                                session=session)
 
     def update_record(self):
-        """### Swautomatic > SWA_api > SWAAsset.`update_record()`
+        """### swautomatic > asset > SWAAsset.`update_record()`
             Desc.
         """
 
         data = self.swa_object.info_steam([self.steamid])
-        data: dict | None = data.get(self.steamid, None)
+        data: dict | None = data.get(self.steamid, None) #type: ignore
         if data is not None:
             data.pop('steamid')
             SWAAsset(self.steamid, self.swa_object, **data).send_to_db()
@@ -170,7 +174,7 @@ class SWAAsset:
                 'There is no data for asset with id: %s', self.steamid)
 
     def get_info(self) -> dict[str, Any] | None:
-        """### Swautomatic > SWA_api > SWAAsset.`get_info()`
+        """### swautomatic > asset > SWAAsset.`get_info()`
             This is the main method to get the asset's or mod's data.
 
         #### Return
@@ -184,7 +188,7 @@ class SWAAsset:
         return info
 
     def download(self) -> bool:
-        """### Swautomatic > SWA_api > SWAAsset.`download()`
+        """### swautomatic > asset > SWAAsset.`download()`
             This method `download()` downloads and extracts a Steam Workshop
             asset or mod. If the asset is not installed or needs an update, it
             downloads the asset from Steam and extracts it to the appropriate
@@ -246,7 +250,7 @@ class SWAAsset:
         return status
 
     def installed(self):
-        """### Swautomatic > SWA_api > SWAAsset.`installed()`
+        """### swautomatic > asset > SWAAsset.`installed()`
             This method takes a `steam_id` as input and returns a boolean value
             indicating whether the corresponding asset or mod is installed on
             the local machine.
@@ -266,7 +270,7 @@ class SWAAsset:
         return is_installed
 
     def get_files(self) -> dict:
-        """### Swautomatic > SWA_api > SWAAsset.`get_files()`
+        """### swautomatic > asset > SWAAsset.`get_files()`
             Searches the files of the asset.
 
         #### Return

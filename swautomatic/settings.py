@@ -36,7 +36,7 @@ config = Config()
 
 
 class SWASettings:
-    """## Swautomatic > Settings > `SWASettings`
+    """## swautomatic > settings > `SWASettings`
     The object used to store settings of the project.
 
     ### Attributes

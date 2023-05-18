@@ -3,10 +3,8 @@ import os
 
 from flask import render_template, request, send_from_directory, url_for
 
-from swautomatic import SWAAsset, SWAObject
-from swautomatic.connection import _assets_coll, _settings, _tags_coll
-from swautomatic.tag import SWATag
-from swautomatic.utils import get_size_format
+from swautomatic import (SWAAsset, SWAObject, SWATag, _assets_coll, _settings,
+                         _tags_coll, get_size_format)
 
 from . import app
 from .forms import PerPageForm, SettingsForm, TagsForm

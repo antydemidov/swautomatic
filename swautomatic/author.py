@@ -8,11 +8,11 @@ import logging
 import requests as rq
 from bs4 import BeautifulSoup as bs
 
-from . import _settings
+from .connection import _settings
 
 
 class SWAAuthor:
-    """## Swautomatic > SWA_api > `SWAAuthor`
+    """## swautomatic > author > `SWAAuthor`
         Desc.
 
     ### Parameters:
@@ -34,7 +34,7 @@ class SWAAuthor:
             self.custom_url: str = data.get('custom_url', None)
 
     def to_dict(self) -> dict:
-        """### Swautomatic > SWA_api > SWAAuthor.`to_dict()`
+        """### swautomatic > author > SWAAuthor.`to_dict()`
             Coverts the object to dictionary.
 
         #### Return
@@ -56,7 +56,7 @@ class SWAAuthor:
                 }
 
     def get_author_data(self) -> dict:
-        """### Swautomatic > SWA_api > SWAAuthor.`get_author_data()`
+        """### swautomatic > author > SWAAuthor.`get_author_data()`
             Parse the author page and returns the data in dict.
 
         #### Return

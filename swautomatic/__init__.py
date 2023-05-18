@@ -42,10 +42,25 @@ asset.download()
 is_installed = asset.installed()
 """
 
-from .asset import SWAAsset
+from datetime import datetime
+import logging
+
+
+date = datetime.today().isoformat(sep='_', timespec='minutes')
+log_filename = f"logs/{date}.log".replace(':', '-')
+with open(log_filename, 'a+', encoding='utf8') as file:
+    file.close()
+logging.basicConfig(level=logging.INFO,
+                    filename=log_filename,
+                    filemode="w",
+                    format="%(asctime)s %(levelname)s %(message)s",
+                    encoding='utf8',
+                    )
+
 from .author import SWAAuthor
 from .connection import _assets_coll, _client, _db, _settings, _tags_coll
 from .object import SWAObject
+from .asset import SWAAsset
 from .preview import SWAPreview
 from .results import CommonResult
 from .settings import DFLT_DATE, SWASettings
