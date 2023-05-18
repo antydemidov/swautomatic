@@ -165,7 +165,7 @@ class SWAAsset:
         """
 
         data = self.swa_object.info_steam([self.steamid])
-        data: dict | None = data.get(self.steamid, None)
+        data: dict | None = data.get(self.steamid, None) #type: ignore
         if data is not None:
             data.pop('steamid')
             SWAAsset(self.steamid, self.swa_object, **data).send_to_db()

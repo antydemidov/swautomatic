@@ -33,8 +33,20 @@ class SWAObject:
     ### Methods
         - `get_asset()`: Retrieves a SWAAsset object for the specified asset
           steam ID.
+        - `get_assets()`: desc.
         - `get_statistics()`: The method returns a CommonResult object that
           contains the retrieved statistics.
+        - `close()`: desc.
+        - `update_tags()`: desc.
+        - `steam_api_data()`: desc.
+        - `check_updates()`: desc.
+        - `info_steam()`: desc.
+        - `ids_database()`: desc.
+        - `ids_steam()`: desc.
+        - `ids_local()`: desc.
+        - `total_reset()`: desc.
+        - `update_reset()`: desc.
+        - `installed()`: desc.
     """
 
     def __init__(self):
@@ -137,12 +149,6 @@ class SWAObject:
                             mods_size=get_size_format(mods_size),
                             total_size=get_size_format(total_size))
 
-    def close(self):
-        """### swautomatic > object > SWAObject.`close()`
-            Closes the database client.
-        """
-        self.client.close()
-
     # UPDATE
     def update_tags(self):
         """### swautomatic > object > SWAObject.`update_tags()`
@@ -197,7 +203,7 @@ class SWAObject:
                                 )
 
     @staticmethod
-    def steam_api_data(ids: list) -> dict[str, dict]:
+    def steam_api_data(ids: list[int] | set[int]) -> dict[str, dict]:
         """### swautomatic > object > SWAObject.`steam_api_data()`
             Returns data about assets and mods from Steam API.
 
@@ -209,6 +215,7 @@ class SWAObject:
             the Steam API.
         """
 
+        ids = list(ids)
         post_data = {'itemcount': len(ids)}
         post_data.update(
             {f'publishedfileids[{i}]': ids[i] for i in range(len(ids))})
@@ -234,12 +241,10 @@ class SWAObject:
     def check_updates(self):
         """### swautomatic > object > SWAObject.`check_updates()`
             Checks for updates of the assets and mods, and updates the database
-            accordingly. It uses the `~swautomatic.SWA_api.SWAObject.steam_api_data()`
-            method.
+            accordingly. It uses the `~.steam_api_data()` method.
         """
 
-        ids = [id['steamid'] for id in _assets_coll.find(
-            {}, projection={'_id': False, 'steamid': True})]
+        ids = self.ids_database()
         data_steam = self.steam_api_data(ids)
 
         projection = {'_id': False, 'steamid': True, 'time_local': True}
@@ -648,7 +653,7 @@ class SWAObject:
                 'Failed to delete directory: %s Error: %s',
                 path, str(error))
 
-    def update_asset(self, asset_ids: list | set, skip: int = 0, limit: int = 0):
+    def update_assets(self, asset_ids: list | set, skip: int = 0, limit: int = 0):
         """### swautomatic > object > SWAObject.`update_asset()`
             If the preview is not downloaded downloads it, updates the asset.
         """
@@ -663,22 +668,28 @@ class SWAObject:
                 else:
                     logging.warning('Asset with ID %s cannot be intalled', asset.steamid)
 
-    def installed(self, steam_id):
-        """### swautomatic > object > SWAObject.`installed()`
-            This method takes a `steam_id` as input and returns a boolean value
-            indicating whether the corresponding asset or mod is installed on
-            the local machine.
+    # def installed(self, steam_id):
+    #     """### swautomatic > object > SWAObject.`installed()`
+    #         This method takes a `steam_id` as input and returns a boolean value
+    #         indicating whether the corresponding asset or mod is installed on
+    #         the local machine.
 
-        #### Return
-            A boolean representating installed asset or not installed.
+    #     #### Return
+    #         A boolean representating installed asset or not installed.
+    #     """
+
+    #     asset_path = os.path.join(_settings.assets_path, str(steam_id))
+    #     mod_path = os.path.join(_settings.mods_path, str(steam_id))
+
+    #     try:
+    #         is_installed = os.path.exists(asset_path) or os.path.exists(mod_path)
+    #     except OSError:
+    #         is_installed = False
+
+    #     return is_installed
+
+    def close(self):
+        """### swautomatic > object > SWAObject.`close()`
+            Closes the database client.
         """
-
-        asset_path = os.path.join(_settings.assets_path, str(steam_id))
-        mod_path = os.path.join(_settings.mods_path, str(steam_id))
-
-        try:
-            is_installed = os.path.exists(asset_path) or os.path.exists(mod_path)
-        except OSError:
-            is_installed = False
-
-        return is_installed
+        self.client.close()

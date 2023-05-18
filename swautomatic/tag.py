@@ -3,6 +3,7 @@
 Module for class `SWATag`.
 """
 
+
 from . import _tags_coll
 
 
@@ -11,7 +12,8 @@ class SWATag:
     Simple class storing id and name of the tag
 
     ### Attributes
-    - `tag` (str): desc."""
+        - `tag` (str): desc.
+    """
 
     def __init__(self, tag):
         self.tag = tag

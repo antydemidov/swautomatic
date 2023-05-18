@@ -46,14 +46,16 @@ from datetime import datetime
 import logging
 
 
-log_filename = f"logs/{datetime.today().isoformat(sep='_', timespec='minutes')}.log".replace(':', '-')
-with open(log_filename, 'a+') as file:
+date = datetime.today().isoformat(sep='_', timespec='minutes')
+log_filename = f"logs/{date}.log".replace(':', '-')
+with open(log_filename, 'a+', encoding='utf8') as file:
     file.close()
 logging.basicConfig(level=logging.INFO,
                     filename=log_filename,
                     filemode="w",
                     format="%(asctime)s %(levelname)s %(message)s",
-                    encoding='utf8')
+                    encoding='utf8',
+                    )
 
 from .author import SWAAuthor
 from .connection import _assets_coll, _client, _db, _settings, _tags_coll
