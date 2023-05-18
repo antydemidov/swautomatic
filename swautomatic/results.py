@@ -5,7 +5,7 @@ __author__ = 'Anton Demidov | @antydemidov'
 
 
 class CommonResult:
-    """## Swautomatic > Results > `CommonResult`
+    """## swautomatic > results > `CommonResult`
     Describes a result of some functions and methods.
 
     ### Attributes

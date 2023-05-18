@@ -1,10 +1,12 @@
-"""Let you connect to MongoDB databases of Swautomatic project."""
+"""# swautomatic > `connection`
+
+Let you connect to MongoDB databases of Swautomatic project."""
 
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
 
-from swautomatic.settings import SWASettings
+from .settings import SWASettings
 
 
 _settings = SWASettings()

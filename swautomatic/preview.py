@@ -13,7 +13,7 @@ from . import _settings
 
 
 class SWAPreview:
-    """## Swautomatic > SWA_api > `SWAPreview`
+    """## swautomatic > preview > `SWAPreview`
     An object representing a preview image for a Steam Workshop item.
 
     ### Attributes:
@@ -38,7 +38,7 @@ class SWAPreview:
         self.url: str = preview_url
 
     def downloaded(self) -> bool:
-        """### Swautomatic > SWA_api > SWAPreview.`to_dict()`
+        """### swautomatic > preview > SWAPreview.`to_dict()`
         Checks if preview is downloaded."""
         downloaded = False
         steam_id = str(self.steam_id)
@@ -49,7 +49,7 @@ class SWAPreview:
         return downloaded
 
     def to_dict(self):
-        """### Swautomatic > SWA_api > SWAPreview.`to_dict()`
+        """### swautomatic > preview > SWAPreview.`to_dict()`
         Returns a dict for database.
 
         #### Return
@@ -57,7 +57,7 @@ class SWAPreview:
         return {'preview_url': self.url}
 
     def download(self) -> int:
-        """### Swautomatic > SWA_api > SWAPreview.`download()`
+        """### swautomatic > preview > SWAPreview.`download()`
 
         Downloads and saves the preview image for the asset.
 

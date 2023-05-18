@@ -7,7 +7,7 @@ from . import _tags_coll
 
 
 class SWATag:
-    """## Swautomatic > SWA_api > `SWATag`
+    """## swautomatic > tag > `SWATag`
     Simple class storing id and name of the tag
 
     ### Attributes
