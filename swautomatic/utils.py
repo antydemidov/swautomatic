@@ -3,6 +3,7 @@
 Module for some functions.
 """
 
+from datetime import datetime
 import os
 
 
@@ -48,3 +49,22 @@ def get_directory_size(directory) -> int:
         # if for whatever reason we can't open the folder, return 0
         return 0
     return total
+
+def __get_local_time(path: str) -> float:
+    """Returns the latest time of modification in directory."""
+    time_local = 1.0
+    for entry in os.scandir(path):
+        if entry.is_file():
+            time = entry.stat().st_mtime
+            if time > time_local:
+                time_local = time
+        elif entry.is_dir():
+            time = __get_local_time(entry.path)
+            if time > time_local:
+                time_local = time
+    return time_local
+
+def get_local_time(path: str) -> datetime:
+    """Returns the latest time of modification in directory."""
+    time_local = __get_local_time(path)
+    return datetime.fromtimestamp(time_local)

@@ -17,6 +17,7 @@ from .connection import _assets_coll, _settings
 from .preview import SWAPreview
 from .settings import DFLT_DATE
 from .tag import SWATag
+from .utils import get_local_time
 
 url_parts = ['cw03361255710', 'cw85745255710',
              'ca40929255710', 'ci03361255710']
@@ -33,11 +34,12 @@ class SWAAsset:
     # modules for this.
     #
     # Optimize database queries: If you're frequently querying the database for
-    # individual assets, you could consider batching the queries or using a more
-    # efficient query mechanism like aggregation in MongoDB.
+    # individual assets, you could consider batching the queries or using a
+    # more efficient query mechanism like aggregation in MongoDB.
     #
     # Optimize I/O operations: If you're frequently reading or writing files to
-    # disk, you could consider using asynchronous I/O operations to speed up the process.
+    # disk, you could consider using asynchronous I/O operations to speed up the
+    # process.
     """## swautomatic > asset > `SWAAsset`
         A class that represents a Steam Workshop asset or mod, which can be
         downloaded and installed.
@@ -108,7 +110,6 @@ class SWAAsset:
         self.author = SWAAuthor(steamid=author_id,
                                 **author_data)
 
-        self.need_update = info.get('need_update', False)
 
         self.type = 'asset' if self.tags is None else 'mod' if any(
             tag.tag == 'Mod' for tag in self.tags) else 'asset'
@@ -121,10 +122,9 @@ class SWAAsset:
                 os.path.join(_settings.mods_path, str(steamid)))
         self.is_installed = os.path.exists(self.path)
 
-        time_local = info.get('time_local', DFLT_DATE) or DFLT_DATE
-        if self.is_installed and (time_local == DFLT_DATE or time_local is None):
-            time_local = datetime.fromtimestamp(os.path.getmtime(self.path))
+        time_local = get_local_time(self.path) if self.is_installed else DFLT_DATE
         self.time_local = time_local
+        self.need_update = (self.is_installed and self.time_local < self.time_updated)
 
     def to_dict(self):
         """### swautomatic > asset > SWAAsset.`to_dict()`
@@ -168,7 +168,10 @@ class SWAAsset:
         data: dict | None = data.get(self.steamid, None) #type: ignore
         if data is not None:
             data.pop('steamid')
-            SWAAsset(self.steamid, self.swa_object, **data).send_to_db()
+            asset = SWAAsset(self.steamid, self.swa_object, **data)
+            asset.send_to_db()
+            if not asset.preview.downloaded():
+                asset.preview.download()
         else:
             logging.critical(
                 'There is no data for asset with id: %s', self.steamid)

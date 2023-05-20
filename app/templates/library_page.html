@@ -54,7 +54,7 @@
             </svg>
         </button>
         {% else %}
-        <button name="download_asset" value="true" type="submit" hover-content="Download asset" formmethod="post"
+        <button name="download_asset" value="true" type="submit" hover-content="Download" formmethod="post"
             onClick="show_loader();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-download"
@@ -65,16 +65,18 @@
             </svg>
         </button>
         {% endif %}
-        <button class="library_toolbar_item" type="submit" hover-content="Update record" value="true" name="update_asset"
-            onClick="show_loader();">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
+        <button class="library_toolbar_item" type="submit" hover-content="Update record" value="true"
+            name="update_asset" onClick="show_loader();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-refresh-cw">
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <polyline points="1 20 1 14 7 14"></polyline>
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
         </button>
-        <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!">
+        <button class="library_toolbar_item" type="submit" hover-content="Delete" value="true"
+            name="delete_asset" onClick="show_loader();">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="feather feather-trash-2">
@@ -117,8 +119,21 @@
             <th>Time updated</th>
             <td>{{ asset.time_updated }}</td>
         </tr>
+        <tr>
+            <th>Time local</th>
+            <td>{{ asset.time_local.isoformat(sep=' ', timespec='seconds') }}</td>
+        </tr>
     </table>
-    <div class="library_page_requirements shadow rounded_block"></div>
+    <div class="library_page_requirements shadow rounded_block">
+        <div class="asset_requirements">
+            <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!"></button>
+            <p>Requerement №1</p>
+        </div>
+        <div class="asset_requirements">
+            <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!"></button>
+            <p>Requerement №2</p>
+        </div>
+    </div>
 </div>
 <div class="library_page_files shadow rounded_block">
     <table class="library_page_files_table">

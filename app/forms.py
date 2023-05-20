@@ -36,8 +36,6 @@ class SettingsForm(FlaskForm):
         label='Asset URL', validators=[InputRequired(), URL()], default=_settings.asset_url)
     user_favs_url = URLField(
         label='User Favourites URL', validators=[InputRequired(), URL()], default=_settings.user_favs_url)
-    # links_file_path = StringField(
-    #     label='Links file path', validators=[InputRequired()], default=settings.links_file_path)
     previews_path = FileField(
         label='Prviews path', validators=[], default=_settings.previews_path)
     steam_api_url = URLField(

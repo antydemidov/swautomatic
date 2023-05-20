@@ -583,6 +583,13 @@ div.library_card_collection>.library_card:hover+.library_card_details {
     left: 50px;
 }
 
+.asset_requirements {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 .shadow {
     -webkit-box-shadow: 0 0 25px 2px rgba(34, 60, 80, .15);
     -moz-box-shadow: 0 0 25px 2px rgba(34, 60, 80, .15);

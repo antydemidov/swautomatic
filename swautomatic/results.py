@@ -1,7 +1,7 @@
-"""desc"""
+"""# swautomatic > `results`
 
-__version__ = '2023.01.09'
-__author__ = 'Anton Demidov | @antydemidov'
+Module for results classes.
+"""
 
 
 class CommonResult:
@@ -10,10 +10,12 @@ class CommonResult:
 
     ### Attributes
     - `status` (str): A string representating a status of running.
-    - `status_bool` (bool): Boolean variant of status."""
+    - `status_bool` (bool): Boolean variant of status.
+    """
+
     def __init__(
         self,
-        status: str = '',
+        status: str = 'Done',
         status_bool: bool = True,
         **kwargs
     ):
@@ -21,3 +23,26 @@ class CommonResult:
         self.status_bool = status_bool
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+
+class StatisticsResult:
+    """## swautomatic > results > `StatisticsResult`
+    Describes a result of SWAObject.`get_statistics()`
+    """
+
+    def __init__(self,
+                 count: int,
+                 count_by_tag: dict[str, int],
+                 installed: int,
+                 not_installed: int,
+                 assets_size: str,
+                 mods_size: str,
+                 total_size: str,
+                 ):
+        self.count = count
+        self.count_by_tag = count_by_tag
+        self.installed = installed
+        self.not_installed = not_installed
+        self.assets_size = assets_size
+        self.mods_size = mods_size
+        self.total_size = total_size
