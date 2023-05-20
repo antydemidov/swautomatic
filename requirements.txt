@@ -1,7 +1,6 @@
 beautifulsoup4==4.11.1
 Flask-WTF==1.0.1
 Flask==2.2.5
-jsonschema==4.17.3
 pillow==9.5.0
 pymongo==4.3.3
 python-decouple==3.8
