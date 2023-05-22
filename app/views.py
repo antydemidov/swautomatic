@@ -76,8 +76,9 @@ def library():
     statistics = swa_object.get_statistics()
 
     assets_count = swa_object.count_assets(fltr)
-    assets_cl_list = swa_object.get_assets(
-        fltr=fltr, skip=(page_num-1)*per_page, limit=per_page)
+    assets_cl_list = swa_object.get_assets(fltr=fltr,
+                                           skip=(page_num-1)*per_page,
+                                           limit=per_page)
     last_page = assets_count // per_page + 1
     datalist = []
 

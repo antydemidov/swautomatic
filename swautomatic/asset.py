@@ -5,19 +5,22 @@ Module for class `SWAAsset`.
 
 import logging
 import os
-from datetime import datetime
 from typing import Any
 from zipfile import ZipFile
 
 import requests as rq
 
 from .author import SWAAuthor
-from .connection import _assets_coll, _settings
-# from . import SWAObject
 from .preview import SWAPreview
-from .settings import DFLT_DATE
+from .settings import ASSET, DFLT_DATE, MOD
 from .tag import SWATag
 from .utils import get_local_time
+try:
+    from . import SWAObject
+except:
+    pass
+
+__all__ = ['SWAAsset']
 
 url_parts = ['cw03361255710', 'cw85745255710',
              'ca40929255710', 'ci03361255710']
@@ -28,18 +31,6 @@ base_links = [f'https://cdn.ggntw.com/{i}/' for i in url_parts] + [
 
 
 class SWAAsset:
-    # Use multithreading or multiprocessing: If you have many assets to download
-    # or process, you could consider using multiple threads or processes to
-    # speed up the operations. You could use the threading or multiprocessing
-    # modules for this.
-    #
-    # Optimize database queries: If you're frequently querying the database for
-    # individual assets, you could consider batching the queries or using a
-    # more efficient query mechanism like aggregation in MongoDB.
-    #
-    # Optimize I/O operations: If you're frequently reading or writing files to
-    # disk, you could consider using asynchronous I/O operations to speed up the
-    # process.
     """## swautomatic > asset > `SWAAsset`
         A class that represents a Steam Workshop asset or mod, which can be
         downloaded and installed.
@@ -53,13 +44,13 @@ class SWAAsset:
           methods for interacting with the Steam Web API and Steam Workshop.
 
     ### Methods
-        - `info_steam(self) -> dict`
-        - `info_database(self)`
-        - `get_info(self)`
-        - `download_preview(self)`
-        - `update_preview_url(self)`
-        - `download(self) -> bool`
-        - `is_installed(self)`
+        - `to_dict()`: desc.
+        - `send_to_db()`: desc.
+        - `update_record()`: desc.
+        - `get_info()`: desc.
+        - `download()`: desc.
+        - `installed()`: desc.
+        - `get_files()`: desc.
 
     ### Example::
 
@@ -83,8 +74,8 @@ class SWAAsset:
                 print("There was an error downloading or installing the asset.")
     """
 
-    def __init__(self, steamid: int | str, swa_object, **kwargs):
-        self.steamid = int(steamid) # type: ignore
+    def __init__(self, steamid: int | str, swa_object: "SWAObject", **kwargs):
+        self.steamid = int(steamid)
         self.swa_object = swa_object
 
         info = kwargs or self.get_info()
@@ -107,23 +98,21 @@ class SWAAsset:
         author_id = int(author_data.get('steam_id64', 0))
         if author_data:
             author_data.pop('steam_id64')
-        self.author = SWAAuthor(steamid=author_id,
-                                **author_data)
+        self.author = SWAAuthor(steamid=author_id, **author_data)
 
+        self.type = ASSET if self.tags is None else MOD if any(
+            tag.tag == 'Mod' for tag in self.tags) else ASSET
 
-        self.type = 'asset' if self.tags is None else 'mod' if any(
-            tag.tag == 'Mod' for tag in self.tags) else 'asset'
-
-        if self.type == 'asset':
+        if self.type == ASSET:
             self.path = os.path.abspath(os.path.join(
-                _settings.assets_path, str(steamid)))
+                self.swa_object.settings.assets_path, str(steamid)))
         else:
             self.path = os.path.abspath(
-                os.path.join(_settings.mods_path, str(steamid)))
+                os.path.join(self.swa_object.settings.mods_path, str(steamid)))
         self.is_installed = os.path.exists(self.path)
 
-        time_local = get_local_time(self.path) if self.is_installed else DFLT_DATE
-        self.time_local = time_local
+        self.time_local = get_local_time(
+            self.path) if self.is_installed else DFLT_DATE
         self.need_update = (self.is_installed and self.time_local < self.time_updated)
 
     def to_dict(self):
@@ -151,24 +140,31 @@ class SWAAsset:
         """### swautomatic > asset > SWAAsset.`send_to_db()`
             Sends the record to the database. If the record exists updates it,
             else inserts the new record to the database.
+
+        #### Return
+            None.
         """
 
         data = self.to_dict()
-        _assets_coll.update_one(filter={'steamid': data['steamid']},
-                               update={'$set': data},
-                               upsert=True,
-                               session=session)
+        self.swa_object.assets_coll.update_one(
+            filter={'steamid': data['steamid']},
+            update={'$set': data},
+            upsert=True,
+            session=session)
 
-    def update_record(self):
+    def update_record(self) -> None:
         """### swautomatic > asset > SWAAsset.`update_record()`
             Desc.
+
+        #### Return
+            None.
         """
 
         data = self.swa_object.info_steam([self.steamid])
-        data: dict | None = data.get(self.steamid, None) #type: ignore
+        data = data.get(self.steamid, None)
         if data is not None:
             data.pop('steamid')
-            asset = SWAAsset(self.steamid, self.swa_object, **data)
+            asset = SWAAsset(self.steamid, **data)
             asset.send_to_db()
             if not asset.preview.downloaded():
                 asset.preview.download()
@@ -184,7 +180,7 @@ class SWAAsset:
             A dictionary with data about asset.
         """
 
-        info = _assets_coll.find_one({'steamid': self.steamid})
+        info = self.swa_object.assets_coll.find_one({'steamid': self.steamid})
         if not info:
             info = self.swa_object.info_steam(
                 [self.steamid]).get(self.steamid, None)
@@ -213,12 +209,16 @@ class SWAAsset:
 
         for base_link in base_links:
             url = f'{base_link}{self.steamid}.zip'
-            url_headers = rq.head(url, timeout=_settings.timeout).headers
+            url_headers = rq.head(url,
+                                  timeout=self.swa_object.settings.timeout
+                                  ).headers
             content_type = url_headers.get('Content-Type')
             content_length = int(url_headers.get('Content-Length', 0))
             if (content_type and content_type.split(' ')[0] in filetypes and
                 content_length >= 10000):
-                with rq.get(url, stream=True, timeout=_settings.longtimeout) as req:
+                with rq.get(url, stream=True,
+                            timeout=self.swa_object.settings.longtimeout
+                            ) as req:
                     with open(path, 'wb') as file:
                         file.write(req.content)
                 status = True
@@ -226,33 +226,31 @@ class SWAAsset:
 
         try:
             with ZipFile(path, 'r') as file:
-                if self.type == 'mod':
-                    extract_path = _settings.mods_path
+                if self.type == MOD:
+                    extract_path = self.swa_object.settings.mods_path
                 else:
-                    extract_path = _settings.assets_path
+                    extract_path = self.swa_object.settings.assets_path
                 file.extractall(extract_path)
 
             os.remove(path)
             status = True
+            self.swa_object.assets_coll.update_one(
+                {'steamid': self.steamid},
+                {'$set': {
+                    'is_installed': True,
+                    'time_local': get_local_time(extract_path),
+                    'need_update': False
+                }}
+            )
             logging.info('Asset with ID %s was installed', self.steamid)
         except OSError:
             status = False
             logging.critical(
                 'Asset with ID %s cannot be installed', self.steamid)
 
-        if status:
-            _assets_coll.update_one(
-                {'steamid': self.steamid},
-                {'$set': {
-                    'is_installed': True,
-                    'time_local': datetime.now(),
-                    'need_update': False
-                }}
-            )
-
         return status
 
-    def installed(self):
+    def installed(self) -> bool:
         """### swautomatic > asset > SWAAsset.`installed()`
             This method takes a `steam_id` as input and returns a boolean value
             indicating whether the corresponding asset or mod is installed on
@@ -261,8 +259,10 @@ class SWAAsset:
         #### Result
             A boolean.
         """
-        asset_path = os.path.join(_settings.assets_path, str(self.steamid))
-        mod_path = os.path.join(_settings.mods_path, str(self.steamid))
+        asset_path = os.path.join(
+            self.swa_object.settings.assets_path, str(self.steamid))
+        mod_path = os.path.join(
+            self.swa_object.settings.mods_path, str(self.steamid))
 
         try:
             is_installed = os.path.exists(
@@ -272,7 +272,7 @@ class SWAAsset:
 
         return is_installed
 
-    def get_files(self) -> dict:
+    def get_files(self) -> dict[str, int]:
         """### swautomatic > asset > SWAAsset.`get_files()`
             Searches the files of the asset.
 

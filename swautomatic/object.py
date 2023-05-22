@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 from datetime import datetime
+from typing import Optional
 
 import requests as rq
 from bs4 import BeautifulSoup as bs
@@ -19,7 +20,9 @@ from .author import SWAAuthor
 from .connection import _assets_coll, _client, _settings, _tags_coll
 from .results import CommonResult, StatisticsResult
 from .settings import DFLT_DATE
-from .utils import get_directory_size, get_size_format
+from .utils import get_directory_size, get_local_time, get_size_format
+
+__all__ = ['SWAObject']
 
 
 class SWAObject:
@@ -54,6 +57,8 @@ class SWAObject:
     def __init__(self):
         self.client = _client
         self.settings = _settings
+        self.assets_coll = _assets_coll
+        self.tags_coll = _tags_coll
 
     def get_asset(self, steam_id: int):
         """### swautomatic > object > SWAObject.`get_asset()`
@@ -67,7 +72,7 @@ class SWAObject:
         """
         return SWAAsset(steam_id, swa_object=self)
 
-    def get_assets(self, steam_ids: list | None = None, fltr: dict|None = None,
+    def get_assets(self, steam_ids: Optional[list[int]] = None, fltr: Optional[dict] = None,
                    skip: int = 0, limit: int = 0):
         """### swautomatic > object > SWAObject.`get_assets()`
 
@@ -96,10 +101,10 @@ class SWAObject:
         if steam_ids:
             fltr.update({'steamid': {'$in': steam_ids}})
 
-        data = _assets_coll.find(filter=fltr,
-                                 skip=skip,
-                                 limit=limit,
-                                 )
+        data = self.assets_coll.find(filter=fltr,
+                                     skip=skip,
+                                     limit=limit,
+                                     )
         return [SWAAsset(swa_object=self, **info) for info in data]
 
     def get_statistics(self):
@@ -128,20 +133,20 @@ class SWAObject:
         """
 
         # Add an aggregation here, now it has a loop with a lot of tags
-        count = _assets_coll.count_documents({})
-        tags = [tag['tag'] for tag in _tags_coll.find({})]
+        count = self.assets_coll.count_documents({})
+        tags = [tag['tag'] for tag in self.tags_coll.find({})]
 
         stats = {}
         for tag in tags:
-            stats.update({tag: _assets_coll.count_documents({'tags': tag})})
+            stats.update({tag: self.assets_coll.count_documents({'tags': tag})})
 
-        installed = _assets_coll.count_documents(
+        installed = self.assets_coll.count_documents(
             {'is_installed': True})
-        not_installed = _assets_coll.count_documents(
+        not_installed = self.assets_coll.count_documents(
             {'is_installed': False})
 
-        assets_size = get_directory_size(_settings.assets_path)
-        mods_size = get_directory_size(_settings.mods_path)
+        assets_size = get_directory_size(self.settings.assets_path)
+        mods_size = get_directory_size(self.settings.mods_path)
         total_size = assets_size + mods_size
 
         return StatisticsResult(count=count,
@@ -170,22 +175,22 @@ class SWAObject:
         try:
             response = rq.get(
                 'https://steamcommunity.com/app/255710/workshop/',
-                timeout=_settings.timeout)
+                timeout=self.settings.timeout)
             soup = bs(response.content, 'html.parser')
             tags_soup = soup.find_all('label', 'tag_label')
             tags_at_steam = [' '.join(re.findall(r'\S+', tag.text)[:-1])
                              for tag in tags_soup]
-            tags_in_db = [tag['tag'] for tag in _tags_coll.find({})]
+            tags_in_db = [tag['tag'] for tag in self.tags_coll.find({})]
 
             tags_to_del = list(set(tags_in_db) - set(tags_at_steam))
             tags_to_upd = list(set(tags_at_steam) - set(tags_in_db))
 
             if tags_to_del:
-                _tags_coll.delete_many({'tag': {'$in': tags_to_del}})
+                self.tags_coll.delete_many({'tag': {'$in': tags_to_del}})
             if tags_to_upd:
                 data = [{'tag': tag} for tag in tags_to_upd]
                 data.append({'tag': 'No tags'})
-                _tags_coll.insert_many(data)
+                self.tags_coll.insert_many(data)
 
             if tags_to_del or tags_to_upd:
                 status = f'Done! Deleted {len(tags_to_del)} tags '
@@ -205,8 +210,7 @@ class SWAObject:
                                 message=str(error)
                                 )
 
-    @staticmethod
-    def steam_api_data(ids: list[int] | set[int]) -> dict[str, dict]:
+    def steam_api_data(self, ids: list[int] | set[int]) -> dict[str, dict]:
         """### swautomatic > object > SWAObject.`steam_api_data()`
             Returns data about assets and mods from Steam API.
 
@@ -226,8 +230,8 @@ class SWAObject:
 
         data = []
         try:
-            with rq.post(_settings.steam_api_url, data=post_data,
-                         timeout=_settings.longtimeout) as req:
+            with rq.post(self.settings.steam_api_url, data=post_data,
+                         timeout=self.settings.longtimeout) as req:
                 data = req.json()['response']['publishedfiledetails']
         except (ValueError, KeyError) as error:
             logging.critical('The connection was not established. %s', error)
@@ -235,7 +239,7 @@ class SWAObject:
         result = {
             item['publishedfileid']: {
                 field: datetime.fromtimestamp(item[field]) if 'time' in field
-                else item[field] for field in _settings.needed_fields if field
+                else item[field] for field in self.settings.needed_fields if field
                 in item
             } for item in data
         }
@@ -252,7 +256,7 @@ class SWAObject:
 
         projection = {'_id': False, 'steamid': True, 'time_local': True}
         asset_times = {
-            asset['steamid']: asset['time_local'] for asset in _assets_coll.find(
+            asset['steamid']: asset['time_local'] for asset in self.assets_coll.find(
                 {}, projection=projection)
         }
 
@@ -269,10 +273,10 @@ class SWAObject:
                                           'need_update': True
                                       }}))
         if bulk:
-            count = _assets_coll.bulk_write(bulk).modified_count
+            count = self.assets_coll.bulk_write(bulk).modified_count
             logging.info('Updated %s assets', count)
 
-    def info_steam(self, ids: list):
+    def info_steam(self, ids: list) -> dict[int, dict]:
         """### swautomatic > object > SWAObject.`info_steam()`
             Returns the formated dictionary with the data from Steam. It uses
             `~swautomatic.SWA_api.SWAObject.steam_api_data()`.
@@ -318,19 +322,15 @@ class SWAObject:
 
                 # === path ===
                 if 'Mod' in workshop_tags:
-                    path = os.path.join(_settings.mods_path, str(steam_id))
+                    path = os.path.join(self.settings.mods_path, str(steam_id))
                 else:
-                    path = os.path.join(_settings.assets_path, str(steam_id))
+                    path = os.path.join(self.settings.assets_path, str(steam_id))
 
                 # === is_installed ===
                 is_installed = os.path.exists(path)
 
                 # === time_local ===
-                time_local = DFLT_DATE
-                if is_installed:
-                    time_local = datetime.fromtimestamp(os.path.getmtime(path))
-                else:
-                    time_local = DFLT_DATE
+                time_local = get_local_time(path) if is_installed else DFLT_DATE
                 file_size: int = value.get('file_size', 0)
                 time_created = value.get('time_created', DFLT_DATE)
                 time_updated = value.get('time_updated', DFLT_DATE)
@@ -371,8 +371,7 @@ class SWAObject:
     #     asset = SWAAsset(asset_id)
     #     await asset.download_preview()
 
-    @staticmethod
-    def ids_database() -> set[int]:
+    def ids_database(self) -> set[int]:
         """### swautomatic > object > SWAObject.`ids_database()`
             Returns a set of Steam IDs of assets stored in the database.
 
@@ -380,7 +379,7 @@ class SWAObject:
             A set of Steam IDs.
         """
 
-        return set(int(asset['steamid']) for asset in _assets_coll.find(
+        return set(int(asset['steamid']) for asset in self.assets_coll.find(
             {}, projection={'steamid': True}))
 
     def ids_steam(self) -> set[int]:
@@ -398,7 +397,7 @@ class SWAObject:
         params = {'browsefilter': 'myfavorites',
                   'sortmethod': 'alpha',
                   'section': 'items',
-                  'appid': _settings.appid,
+                  'appid': self.settings.appid,
                   'p': 1,
                   'numperpage': 30}
 
@@ -406,8 +405,10 @@ class SWAObject:
             while str(msg) == 'None':
                 params.update({'p': i})
                 try:
-                    req = session.get(_settings.user_favs_url,
-                                      params=params, timeout=_settings.timeout)
+                    req = session.get(self.settings.user_favs_url,
+                                      params=params,
+                                      timeout=self.settings.timeout
+                                      )
                     req.raise_for_status()
                 except rq.exceptions.RequestException as error:
                     logging.error(str(error))
@@ -435,11 +436,11 @@ class SWAObject:
         asset_ids = set()
         mod_ids = set()
 
-        for entry in os.scandir(_settings.assets_path):
+        for entry in os.scandir(self.settings.assets_path):
             if entry.is_dir() and entry.name.isdigit():
                 asset_ids.add(int(entry.name))
 
-        for entry in os.scandir(_settings.mods_path):
+        for entry in os.scandir(self.settings.mods_path):
             if entry.is_dir() and entry.name.isdigit():
                 mod_ids.add(int(entry.name))
 
@@ -461,14 +462,14 @@ class SWAObject:
         ids_local = self.ids_local()
 
         # Remove all records in the database
-        _assets_coll.delete_many({})
+        self.assets_coll.delete_many({})
 
         # Remove all previews
         preview_files = [entry.name for entry in os.scandir(
-            _settings.previews_path) if entry.is_file() and entry.name != 'empty.jpg']
+            self.settings.previews_path) if entry.is_file() and entry.name != 'empty.jpg']
         for preview_file in preview_files:
             try:
-                os.remove(os.path.join(_settings.previews_path, preview_file))
+                os.remove(os.path.join(self.settings.previews_path, preview_file))
             except OSError as error:
                 logging.error(
                     'Error occurred while deleting preview file %s: %s',
@@ -527,7 +528,7 @@ class SWAObject:
         """
 
         if asset_ids:
-            deleted_count = _assets_coll.delete_many(
+            deleted_count = self.assets_coll.delete_many(
                 {'steamid': {'$in': list(asset_ids)}},
                 session=session
             ).deleted_count
@@ -558,7 +559,7 @@ class SWAObject:
             data = self.info_steam(list(asset_ids))
             for key, value in data.items():
                 value.pop('steamid')
-                asset = SWAAsset(key, self, **value)
+                asset = SWAAsset(key, **value)
                 asset.send_to_db(session=session)
 
                 # Log the asset update
@@ -586,11 +587,11 @@ class SWAObject:
         inserted_count = 0
         if asset_ids:
             new_data = self.info_steam(list(asset_ids))
-            inserted_count = len(_assets_coll.insert_many(
+            inserted_count = len(self.assets_coll.insert_many(
                 list(new_data.values()), session=session).inserted_ids)
             for key, value in new_data.items():
                 value.pop('steamid')
-                asset = SWAAsset(key, self, **value)
+                asset = SWAAsset(key, **value)
                 asset.preview.download()
         logging.info('Inserted %s assets to database', inserted_count)
         return inserted_count
@@ -602,9 +603,9 @@ class SWAObject:
             asset IDs and deletes those files.
         """
 
-        previews_dir = os.listdir(_settings.previews_path)
+        previews_dir = os.listdir(self.settings.previews_path)
         for asset_id in asset_ids:
-            files = [os.path.join(_settings.previews_path, file)
+            files = [os.path.join(self.settings.previews_path, file)
                      for file in previews_dir if str(asset_id) in file]
             for file in files:
                 os.remove(file)
@@ -628,8 +629,8 @@ class SWAObject:
 
         size = 0
         for asset_id in asset_ids:
-            asset_path = os.path.join(_settings.assets_path, str(asset_id))
-            mod_path = os.path.join(_settings.mods_path, str(asset_id))
+            asset_path = os.path.join(self.settings.assets_path, str(asset_id))
+            mod_path = os.path.join(self.settings.mods_path, str(asset_id))
 
             if os.path.exists(asset_path):
                 size += get_directory_size(asset_path)
@@ -674,7 +675,7 @@ class SWAObject:
         """### swautomatic > object > SWAObject.`get_tags()`
             Returns a list of every tag in the database.
         """
-        return sorted([tag['tag'] for tag in _tags_coll.find({})])
+        return sorted([tag['tag'] for tag in self.tags_coll.find({})])
 
     def count_assets(self, fltr: dict) -> int:
         """### swautomatic > object > SWAObject.`count_assets()`
@@ -683,7 +684,7 @@ class SWAObject:
         #### Return
         `int`: Number of assets in the database.
         """
-        return _assets_coll.count_documents(filter=fltr)
+        return self.assets_coll.count_documents(filter=fltr)
 
     def close(self):
         """### swautomatic > object > SWAObject.`close()`

@@ -3,6 +3,13 @@
 Module for results classes.
 """
 
+from dataclasses import dataclass
+
+__all__ = [
+    'CommonResult',
+    'StatisticsResult',
+]
+
 
 class CommonResult:
     """## swautomatic > results > `CommonResult`
@@ -25,24 +32,15 @@ class CommonResult:
             setattr(self, key, value)
 
 
+@dataclass
 class StatisticsResult:
     """## swautomatic > results > `StatisticsResult`
     Describes a result of SWAObject.`get_statistics()`
     """
-
-    def __init__(self,
-                 count: int,
-                 count_by_tag: dict[str, int],
-                 installed: int,
-                 not_installed: int,
-                 assets_size: str,
-                 mods_size: str,
-                 total_size: str,
-                 ):
-        self.count = count
-        self.count_by_tag = count_by_tag
-        self.installed = installed
-        self.not_installed = not_installed
-        self.assets_size = assets_size
-        self.mods_size = mods_size
-        self.total_size = total_size
+    count: int
+    count_by_tag: dict[str, int]
+    installed: int
+    not_installed: int
+    assets_size: str
+    mods_size: str
+    total_size: str

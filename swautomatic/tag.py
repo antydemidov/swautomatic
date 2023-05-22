@@ -4,7 +4,9 @@ Module for class `SWATag`.
 """
 
 
-from . import _tags_coll
+from .connection import _tags_coll
+
+__all__ = ['SWATag']
 
 
 class SWATag:

@@ -10,6 +10,10 @@ from bs4 import BeautifulSoup as bs
 
 from .connection import _settings
 
+__all__ = [
+    'SWAAuthor',
+]
+
 
 class SWAAuthor:
     """## swautomatic > author > `SWAAuthor`

@@ -9,7 +9,9 @@ from urllib.request import urlopen
 
 from PIL import Image, UnidentifiedImageError
 
-from . import _settings
+from .connection import _settings
+
+__all__ = ['SWAPreview']
 
 
 class SWAPreview:

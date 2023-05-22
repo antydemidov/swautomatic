@@ -30,7 +30,21 @@ from jsonschema import ValidationError, validate
 
 from app.config import Config
 
+__all__ = [
+    'DFLT_DATE',
+    'ASSET',
+    'MOD',
+    'UTF8',
+    'SWASettings',
+]
+
 DFLT_DATE = datetime.fromordinal(1)
+"""Default datetime if calculation was failed."""
+# types
+ASSET = 'asset'
+"""The name of type 'Asset'"""
+MOD = 'mod'
+"""The name of type 'Mod'"""
 UTF8 = 'utf-8'
 config = Config()
 
@@ -90,23 +104,18 @@ class SWASettings:
     the new value."""
 
     def __init__(self) -> None:
-        try:
+        # ChatGPT said to use cerberus instead of jsonschema
+        # validate(settings, schema)
+        if os.path.exists('settings.json'):
             with open('settings.json', 'r', encoding=UTF8) as file:
                 settings: dict = json.load(file)
-        except FileNotFoundError('Check the file settings.json') as error:  # type: ignore
-            raise error
+        else:
+            raise FileNotFoundError('Check the file settings.json')
 
         self.app_path: str = settings.get('app_path', '')
         self.appid: int = settings.get('appid', 0)
         self.asset_url: str = settings.get('asset_url', '')
         self.authmechanism: str = settings.get('authmechanism', '')
-        self.author_needed_fields: list = ['steamID64',
-                                           'steamID',
-                                           'avatarIcon',
-                                           'avatarMedium',
-                                           'avatarFull',
-                                           'customURL',
-                                           ]
         self.authsource: str = settings.get('authsource', '')
         self.common_path: str = settings.get('common_path', '')
         self.database_name: str = settings.get('database_name', '')
@@ -119,19 +128,23 @@ class SWASettings:
         self.user_favs_url: str = settings.get('user_favs_url', '')
         self.user_url_id: str = settings.get('user_url_id', '')
         self.user_url_profiles: str = settings.get('user_url_profiles', '')
-
-        # ChatGPT said to use cerberus instead of jsonschema
-        # validate(settings, schema)
-
+        self.uri = f'mongodb://{quote_plus(config.MONGO_USERNAME)}:' \
+            + f'{quote_plus(config.MONGO_PASSWORD)}@' \
+            + f'{config.HOST}:{config.PORT}/' \
+            + f'?authMechanism={self.authmechanism}&' \
+            + f'authSource={self.authsource}'
+        # Constants
+        self.author_needed_fields: list = ['steamID64',
+                                           'steamID',
+                                           'avatarIcon',
+                                           'avatarMedium',
+                                           'avatarFull',
+                                           'customURL',
+                                           ]
         self.assets_path = os.path.join(self.common_path, 'Maps')
         self.mods_path = os.path.join(self.common_path, 'Mods')
         if self.app_path == '':
             self.app_path = os.path.abspath(os.path.curdir)
-
-        url = f'mongodb://{quote_plus(config.MONGO_USERNAME)}:{quote_plus(config.MONGO_PASSWORD)}'
-        auth = f'{config.HOST}:{config.PORT}'
-        params = f'?authMechanism={self.authmechanism}&authSource={self.authsource}'
-        self.uri = f'{url}@{auth}/{params}'
 
         self.mapping_fields = {
             'steamID64': 'steam_id64',
@@ -162,5 +175,6 @@ class SWASettings:
             with open('settings.json', 'w', encoding=UTF8) as file:
                 file.write(json.dumps(settings))
             setattr(self, key, value)
-        except FileNotFoundError('Check the file settings.json') as error:  # type: ignore
+        except FileNotFoundError as error:
+            error.add_note('Check the file settings.json')
             raise error

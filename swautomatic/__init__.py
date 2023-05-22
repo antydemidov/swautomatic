@@ -45,6 +45,13 @@ is_installed = asset.installed()
 from datetime import datetime
 import logging
 
+from .connection import (_assets_coll,
+                         _client,
+                         _db,
+                         _settings,
+                         _tags_coll,
+                         )
+
 
 date = datetime.today().isoformat(sep='_', timespec='minutes')
 log_filename = f"logs/{date}.log".replace(':', '-')
@@ -57,15 +64,38 @@ logging.basicConfig(level=logging.INFO,
                     encoding='utf8',
                     )
 
-from .author import SWAAuthor
-from .connection import _assets_coll, _client, _db, _settings, _tags_coll
+# swa_object = SWAObject(_client, _settings, _assets_coll, _tags_coll)
 from .object import SWAObject
 from .asset import SWAAsset
+from .settings import DFLT_DATE, ASSET, MOD, SWASettings
+from .author import SWAAuthor
 from .preview import SWAPreview
-from .results import CommonResult
-from .settings import DFLT_DATE, SWASettings
+from .results import CommonResult, StatisticsResult
 from .tag import SWATag
-from .utils import get_directory_size, get_size_format
+from .utils import get_directory_size, get_size_format, get_local_time
 
 __version__ = 'v0.1'
 __author__ = 'Anton Demidov | @antydemidov'
+__all__ = [
+    '__version__',
+    '__author__',
+    '_assets_coll',
+    '_client',
+    '_db',
+    '_settings',
+    '_tags_coll',
+    'SWAObject',
+    'SWAAsset',
+    'SWAAuthor',
+    'SWAPreview',
+    'CommonResult',
+    'StatisticsResult',
+    'DFLT_DATE',
+    'ASSET',
+    'MOD',
+    'SWASettings',
+    'SWATag',
+    'get_directory_size',
+    'get_size_format',
+    'get_local_time',
+]
