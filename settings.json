@@ -9,20 +9,9 @@
     "user_url_id": "https://steamcommunity.com/id/",
     "asset_url": "https://steamcommunity.com/sharedfiles/filedetails/",
     "user_favs_url": "https://steamcommunity.com/id/antydemidov/myworkshopfiles",
-    "links_file_path": "links.txt",
     "previews_path": "previews",
     "steam_api_url": "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1",
     "timeout": 15.0,
     "longtimeout": 60.0,
-    "per_page": 20,
-    "needed_fields": [
-        "creator",
-        "file_size",
-        "preview_url",
-        "publishedfileid",
-        "tags",
-        "time_created",
-        "time_updated",
-        "title"
-    ]
+    "per_page": 20
 }
