@@ -1,10 +1,9 @@
 """Here must be the string"""
-from flask import redirect, render_template, request, send_from_directory, url_for
+from flask import (render_template, request, send_from_directory,  # redirect,
+                   url_for)
+from app.filter import LibraryFilter, FilterMonitor
 
-from swautomatic import (SWAObject,
-                         get_size_format,
-                         find_preview
-                         )
+from swautomatic import SWAObject, find_preview, get_size_format
 
 from . import app
 from .forms import PerPageForm, SettingsForm, TagsForm
@@ -28,22 +27,23 @@ def index():
 def library():
     title = 'Swautomatic | Library'
     result = None
+    per_page_form = PerPageForm(request.form)
+    tags_form = TagsForm(request.form)
+
     page_num = request.args.get('p', default=1, type=int)
     tag_name = request.args.get('tag', default='', type=str)
     per_page = swa_object.settings.per_page or 20
-    need_upd = request.form.get('show_need_upd') or request.args.get('show_need_upd')
-    need_upd = int(need_upd) if need_upd else 0
+    need_upd = request.form.get('need_upd', default=0, type=int) or request.args.get(
+        'need_upd', default=0, type=int)
     library_filter = request.form.get(
         'library_filters_choices', default=0, type=int)
 
-    per_page_form = PerPageForm(request.form)
     if per_page_form.per_page_selector.data:
         per_page = int(per_page_form.per_page_selector.data)
         if per_page != swa_object.settings.per_page:
-            swa_object.settings.per_page = per_page
+            swa_object.settings.update('per_page', per_page)
 
-    tags = swa_object.tags.list_tags()  # TODO: Cash it.
-    tags_form = TagsForm(request.form)
+    tags = sorted(list(swa_object.tags.list_tags()))  # TODO: Cash it.
     tag = tags_form.tag_choices.data or tag_name or request.form.get('tag')
 
     # Update status
@@ -59,22 +59,27 @@ def library():
     if request.form.get('update_database', 'false') == 'true':
         result = swa_object.update_database()
 
-    # fltr = {}
-
     is_installed = None if not library_filter else library_filter == 1
     no_need_upd = 0 if need_upd == 1 else 1
 
     statistics = swa_object.get_statistics()
 
-    assets_count = swa_object.assets.count_assets(tag=str(tag) if tag else None,
-                                                  need_update=True if need_upd else None,
-                                                  is_installed=is_installed,
-                                                #   other_fltr=fltr
+    if (tag or need_upd != 0 or is_installed is not None or page_num != 1):
+        fltr = LibraryFilter(tag=str(tag) if tag else None,
+                             need_update=True if need_upd else None,
+                             is_installed=is_installed)
+    else:
+        fltr = LibraryFilter()
+        fltr.reset()
+
+    assets_count = swa_object.assets.count_assets(tag=fltr.tag,
+                                                  need_update=fltr.need_update,
+                                                  is_installed=fltr.is_installed,
                                                   )
-    assets_cl_list = swa_object.assets.get_assets(tag=str(tag) if tag else None,
-                                                  need_update=True if need_upd else None,
-                                                  is_installed=is_installed,
-                                                #   other_fltr=fltr,
+
+    assets_cl_list = swa_object.assets.get_assets(tag=fltr.tag,
+                                                  need_update=fltr.need_update,
+                                                  is_installed=fltr.is_installed,
                                                   skip=(page_num-1)*per_page,
                                                   limit=per_page
                                                   )
@@ -91,6 +96,15 @@ def library():
             'author_avatarIcon': str(asset.author.avatar_icon),
         })
 
+    filter_monitor = FilterMonitor(
+        tag_message=fltr.tag if fltr.tag else 'Tag filter is not applied',
+        tag_applied=fltr.tag is not None,
+        need_update_message='Assets which need update' if fltr.need_update else 'Filter is not applied',
+        need_update_applied=fltr.need_update != 0 and fltr.need_update is not None,
+        is_installed_message='Installed assets' if fltr.is_installed else 'Filter is not applied',
+        is_installed_applied=fltr.is_installed is not None,
+    )
+
     return render_template('library.html',
                            title=title,
                            datalist=datalist,
@@ -101,10 +115,11 @@ def library():
                            tags_form=tags_form,
                            per_page_form=per_page_form,
                            selected_tag=tag,
-                           show_need_upd=need_upd,
-                           no_show_need_upd=no_need_upd,
+                           need_upd=need_upd,
+                           no_need_upd=no_need_upd,
                            statistics=statistics,
                            result=result,
+                           filter_monitor=filter_monitor,
                            )
 
 
@@ -127,9 +142,11 @@ def library_page(steam_id):
         files.update({key: {'id': i, 'size': get_size_format(value)}})
         i += 1
     files = files.items()
+    show_time_local = asset.time_local.date().toordinal() != 719163
     return render_template('library_page.html',
                            title=title,
                            asset=asset,
+                           show_time_local=show_time_local,
                            preview_path=preview_path,
                            file_size=file_size,
                            files=files,
@@ -140,6 +157,7 @@ def library_page(steam_id):
 # def download_asset(steam_id):
 #     swa_object.assets.get_asset(steam_id).download()
 #     return redirect(url_for(f'library/{steam_id}'))
+
 
 # @app.route('/library/<int:steam_id>/update_record')
 # def update_record(steam_id):
@@ -161,7 +179,10 @@ def about():
 
 @app.route('/previews/<assetid>')
 def previews(assetid):
-    path = find_preview(swa_object.settings.previews_path, assetid)
+    if swa_object.settings.previews_path:
+        path = find_preview(swa_object.settings.previews_path, assetid)
+    else:
+        path = None
     if path is None:
         path = 'empty.jpg'
     return send_from_directory(f'../{swa_object.settings.previews_path}', path)
@@ -185,3 +206,8 @@ def settings_page():
                            path=path,
                            form=form,
                            )
+
+
+@app.route('/assets/<path>')
+def assets(path):
+    return send_from_directory('./assets/', path)

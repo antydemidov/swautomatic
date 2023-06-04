@@ -16,7 +16,7 @@ __all__ = ['TagsForm',
            'PerPageForm',
            ]
 
-tags = swa_object.tags.list_tags()
+tags = sorted(list(swa_object.tags.list_tags()))
 timeout_choices = [5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0]
 longtimeout_choices = [20.0, 25.0, 30.0, 50.0, 100.0, 150.0, 200.0]
 per_page_choices = [10, 20, 30, 50, 100]
@@ -28,7 +28,7 @@ class TagsForm(FlaskForm):
     ------------------------
     Description.
     """
-    tag_choices = RadioField(choices=sorted(list(tags)), coerce=str)
+    tag_choices = RadioField(choices=tags, coerce=str)
     tag_submit = SubmitField()
 
 

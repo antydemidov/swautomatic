@@ -1,0 +1,160 @@
+/* ICONS */
+.icon#alert-triangle {
+    -webkit-mask-image: url("/assets/alert-triangle.svg");
+    mask-image: url("/assets/alert-triangle.svg");
+}
+
+.icon#book {
+    -webkit-mask-image: url('/assets/book.svg');
+    mask-image: url('/assets/book.svg');
+}
+
+.icon#box {
+    -webkit-mask-image: url('/assets/box.svg');
+    mask-image: url('/assets/box.svg');
+}
+
+.icon#check {
+    -webkit-mask-image: url("/assets/check.svg");
+    mask-image: url("/assets/check.svg");
+}
+
+.icon#chevron-left {
+    -webkit-mask-image: url("/assets/chevron-left.svg");
+    mask-image: url("/assets/chevron-left.svg");
+}
+
+.icon#chevron-right {
+    -webkit-mask-image: url("/assets/chevron-right.svg");
+    mask-image: url("/assets/chevron-right.svg");
+}
+
+.icon#cloud {
+    -webkit-mask-image: url('/assets/cloud.svg');
+    mask-image: url('/assets/cloud.svg');
+}
+
+.icon#database {
+    -webkit-mask-image: url('/assets/database.svg');
+    mask-image: url('/assets/database.svg');
+}
+
+.icon#download-cloud {
+    -webkit-mask-image: url('/assets/download-cloud.svg');
+    mask-image: url('/assets/download-cloud.svg');
+}
+
+.icon#download {
+    -webkit-mask-image: url('/assets/download.svg');
+    mask-image: url('/assets/download.svg');
+}
+
+.icon#filter {
+    -webkit-mask-image: url('/assets/filter.svg');
+    mask-image: url('/assets/filter.svg');
+}
+
+.icon#folder {
+    -webkit-mask-image: url('/assets/folder.svg');
+    mask-image: url('/assets/folder.svg');
+}
+
+.icon#hash {
+    -webkit-mask-image: url('/assets/hash.svg');
+    mask-image: url('/assets/hash.svg');
+}
+
+.icon#help-circle {
+    -webkit-mask-image: url('/assets/help-circle.svg');
+    mask-image: url('/assets/help-circle.svg');
+}
+
+.icon#home {
+    -webkit-mask-image: url('/assets/home.svg');
+    mask-image: url('/assets/home.svg');
+}
+
+.icon#list {
+    -webkit-mask-image: url('/assets/list.svg');
+    mask-image: url('/assets/list.svg');
+}
+
+.icon#loader {
+    -webkit-mask-image: url('/assets/loader.svg');
+    mask-image: url('/assets/loader.svg');
+}
+
+.icon#log-in {
+    -webkit-mask-image: url('/assets/log-in.svg');
+    mask-image: url('/assets/log-in.svg');
+}
+
+.icon#log-out {
+    -webkit-mask-image: url('/assets/log-out.svg');
+    mask-image: url('/assets/log-out.svg');
+}
+
+.icon#refresh-cw {
+    -webkit-mask-image: url('/assets/refresh-cw.svg');
+    mask-image: url('/assets/refresh-cw.svg');
+}
+
+.icon#repeat {
+    -webkit-mask-image: url('/assets/repeat.svg');
+    mask-image: url('/assets/repeat.svg');
+}
+
+.icon#save {
+    -webkit-mask-image: url("/assets/save.svg");
+    mask-image: url("/assets/save.svg");
+}
+
+.icon#search {
+    -webkit-mask-image: url("/assets/search.svg");
+    mask-image: url("/assets/search.svg");
+}
+
+.icon#settings {
+    -webkit-mask-image: url("/assets/settings.svg");
+    mask-image: url("/assets/settings.svg");
+}
+
+.icon#tag {
+    -webkit-mask-image: url("/assets/tag.svg");
+    mask-image: url("/assets/tag.svg");
+}
+
+.icon#toggle-left {
+    -webkit-mask-image: url('/assets/toggle-left.svg');
+    mask-image: url('/assets/toggle-left.svg');
+}
+
+.icon#toggle-right {
+    -webkit-mask-image: url('/assets/toggle-right.svg');
+    mask-image: url('/assets/toggle-right.svg');
+}
+
+.icon#tool {
+    -webkit-mask-image: url('/assets/tool.svg');
+    mask-image: url('/assets/tool.svg');
+}
+
+.icon#trash {
+    -webkit-mask-image: url('/assets/trash.svg');
+    mask-image: url('/assets/trash.svg');
+}
+
+.icon#trash-2 {
+    -webkit-mask-image: url('/assets/trash-2.svg');
+    mask-image: url('/assets/trash-2.svg');
+}
+
+.icon#x-circle {
+    -webkit-mask-image: url('/assets/x-circle.svg');
+    mask-image: url('/assets/x-circle.svg');
+}
+
+.icon#x-square {
+    -webkit-mask-image: url('/assets/x-square.svg');
+    mask-image: url('/assets/x-square.svg');
+}
