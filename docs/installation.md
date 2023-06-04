@@ -3,13 +3,13 @@
 [↑ Up](index.md)
 
 1. Устанавливаем MongoDB community edition::
-2. Заходим в `mongosh`
+1. Заходим в `mongosh`
 
     ```powershell
     mongosh
     ```
 
-3. Выписываем себе пользователя `admin` и записываем `MONGO_USERNAME`, `MONGO_PASSWORD` в `.env` файл (пример лежит в `.env.example`)
+1. Выписываем себе пользователя `admin` и записываем `MONGO_USERNAME`, `MONGO_PASSWORD` в `.env` файл (пример лежит в `.env.example`)
 
     ```mongosh
     use admin
@@ -22,23 +22,27 @@
     )
     ```
 
-4. Создаем базу
+1. Создаем базу
 
     ```mongosh
     use CSws
     ```
 
-5. Создаем коллекции `assets` и `tags`
+1. Создаем коллекции `assets` и `tags`
 
     ```mongosh
     db.createCollection("assets")
     db.createCollection("tags")
     ```
 
-6. Запускаем flask
+1. Запускаем flask
 
     ```powershell
     python3 run.py
     ```
+
+1. Заходим в `settings.json`. Меняем там настройки:
+   - `common_path`, тут должна лежать ваша игра;
+   - `user_favs_url` - это ссылка на ваши избранные, откуда программа будет подтягивать необходимые ассеты.
 
 И переходим по адресу <http://127.0.0.1:5000> или <http://localhost:5000>

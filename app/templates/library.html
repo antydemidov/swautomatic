@@ -25,82 +25,33 @@
 
 <!-- Full screen block for loading -->
 <div class="loader" id="loader">
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24"
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-        stroke-linejoin="round" class="feather feather-loader">
-        <line x1="12" y1="2" x2="12" y2="6"></line>
-        <line x1="12" y1="18" x2="12" y2="22"></line>
-        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-        <line x1="2" y1="12" x2="6" y2="12"></line>
-        <line x1="18" y1="12" x2="22" y2="12"></line>
-        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-        <animateTransform attributeName="transform" dur="2s" type="rotate" from="0" to="360" repeatCount="indefinite" />
-    </svg>
+    <div id='loader' class='icon'></div>
 </div>
 
 <!-- Library statistics -->
 <div class="library_statistics shadow rounded_block">
     <div class="bordered" hover-content="Number of assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-hash">
-            <line x1="4" y1="9" x2="20" y2="9"></line>
-            <line x1="4" y1="15" x2="20" y2="15"></line>
-            <line x1="10" y1="3" x2="8" y2="21"></line>
-            <line x1="16" y1="3" x2="14" y2="21"></line>
-        </svg>
+        <div id='hash' class='icon'></div>
         {{ statistics.count }}
     </div>
     <div class="bordered" hover-content="Number of installed assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-download">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
+        <div id='download' class='icon'></div>
         {{ statistics.installed }}
     </div>
     <div class="bordered" hover-content="Number of not installed assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-cloud">
-            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
-        </svg>
+        <div id='cloud' class='icon'></div>
         {{ statistics.not_installed }}
     </div>
     <div class="bordered" hover-content="Sum of installed assets' sizes">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-box">
-            <path
-                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-            </path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
-        </svg>
+        <div id='box' class='icon'></div>
         {{ statistics.assets_size }}
     </div>
     <div class="bordered" hover-content="Sum of installed mods' sizes">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-tool">
-            <path
-                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
-            </path>
-        </svg>
+        <div id='tool' class='icon'></div>
         {{ statistics.mods_size }}
     </div>
     <div class="bordered" hover-content="Total size">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-database">
-            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-        </svg>
+        <div id='database' class='icon'></div>
         {{ statistics.total_size }}
     </div>
 </div>
@@ -115,20 +66,10 @@
     </fieldset>
     {{ per_page_form.per_page_selector }}
     <button class="library_toolbar_item" type="reset" hover-content="Reset">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-x-square">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-        </svg>
+        <div id='x-square' class='icon'></div>
     </button>
     <button class="library_toolbar_item" type="submit" name="filter" hover-content="Apply filter">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-check">
-            <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
+        <div id='check' class='icon'></div>
     </button>
 </form>
 
@@ -141,13 +82,7 @@
     <form action="{{url_for('library')}}" method="post">
         <button class="library_toolbar_item" type="submit" name="total_reset" value="true" onclick="show_loader();"
             hover-content="Reload database">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-x-circle">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
+            <div id='x-circle' class='icon'></div>
         </button>
         <button class="library_toolbar_item" disabled="disabled" hover-content="Coming soon!"></button>
         <button class="library_toolbar_item" disabled="disabled" hover-content="Coming soon!"></button>
@@ -163,19 +98,11 @@
         <p>{{ asset['name'] }}</p>
         {% if asset['is_installed'] %}
         <div class="library_card_status" hover-content="Installed">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-check">
-                <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            <div id='check' class='icon'></div>
         </div>
         {% else %}
         <div class="library_card_status" hover-content="Not installed">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-cloud disabled">
-                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
-            </svg>
+            <div id='cloud' class='icon'></div>
         </div>
         {% endif %}
     </a>
@@ -191,97 +118,67 @@
     {% endfor %}
 </div>
 
+<!-- Filter monitor -->
+<form class="library_filter_monitor shadow rounded_block" method="post" action="{{url_for('library')}}">
+    <div id='filter' class='icon' {% if not filter_monitor.total %} disabled="disabled" {% endif %}></div>
+    <button class="library_toolbar_item" type="submit" name="filter_tag"
+        hover-content="{{filter_monitor.tag['message']}}" {% if not filter_monitor.tag['applied'] %} disabled="disabled"
+        {% endif %}>
+        <div id='list' class='icon'></div>
+    </button>
+    <button class="library_toolbar_item" type="submit" name="filter_installed"
+        hover-content="{{filter_monitor.is_installed['message']}}" {% if not filter_monitor.is_installed['applied'] %}
+        disabled="disabled" {% endif %}>
+        <div id='download' class='icon'></div>
+    </button>
+    <button class="library_toolbar_item" type="submit" name="filter_need_update"
+        hover-content="{{filter_monitor.need_update['message']}}" {% if not filter_monitor.need_update['applied'] %}
+        disabled="disabled" {% endif %}>
+        <div id='download-cloud' class='icon'></div>
+    </button>
+</form>
+
 <!-- Library Toolbar -->
 <form class="library_toolbar shadow rounded_block" method="post" action="{{url_for('library')}}">
+    <div id='tool' class='icon'></div>
     <!-- Update tags -->
     <button class="library_toolbar_item" type="submit" name="update_tags" value="true" onclick="show_loader();"
         hover-content="Update tags">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-repeat">
-            <polyline points="17 1 21 5 17 9"></polyline>
-            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-            <polyline points="7 23 3 19 7 15"></polyline>
-            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-        </svg>
+        <div id='repeat' class='icon'></div>
     </button>
     <!-- Update status -->
     <button class="library_toolbar_item" type="submit" name="check_updates" value="true" onclick="show_loader();"
         hover-content="Update status of all assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-refresh-cw">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <polyline points="1 20 1 14 7 14"></polyline>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-        </svg>
+        <div id='refresh-cw' class='icon'></div>
     </button>
     <!-- Update the database -->
     <button class="library_toolbar_item" type="submit" name="update_database" value="true" onclick="show_loader();"
         hover-content="Update data of all assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-database">
-            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-        </svg>
+        <div id='database' class='icon'></div>
     </button>
     <!-- Button opening the tags window -->
     <button class="library_toolbar_item" type="button" name="open_tag" onClick="show_tags();"
         hover-content="Open tags list">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-list">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
+        <div id='list' class='icon'></div>
     </button>
     <!-- Button downloading all assets in the database -->
     <button class="library_toolbar_item" type="submit" name="download_all" value="true" onclick="show_loader();"
         hover-content="Download all assets">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-download"
-            viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <path d="M7 10L12 15 17 10" />
-            <path d="M12 15L12 3" />
-        </svg>
+        <div id='download' class='icon'></div>
     </button>
     <!-- Button showing only assets which need update -->
-    <button class="library_toolbar_item" type="submit" value="{{ no_show_need_upd }}" name="show_need_upd"
-        formaction="{{url_for('library', tag=selected_tag, p=page_num, show_need_upd=no_show_need_upd) }}"
-        hover-content="Show need update">
-        {% if show_need_upd == 1 %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-toggle-right">
-            <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
-            <circle cx="16" cy="12" r="3" fill="currentColor"></circle>
-        </svg>
+    <button class="library_toolbar_item" type="submit" value="{{ no_need_upd }}" name="need_upd"
+        formaction="{{url_for('library', need_upd=no_need_upd) }}" hover-content="Show need update">
+        {% if need_upd == 1 %}
+        <div id='toggle-right' class='icon'></div>
         {% else %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-toggle-left">
-            <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
-            <circle cx="8" cy="12" r="3" fill="currentColor"></circle>
-        </svg>
+        <div id='toggle-left' class='icon'></div>
         {% endif %}
     </button>
     <!-- Button opening Danger Zone -->
     <button class="library_toolbar_item" type="button" id="danger_zone" onClick="show_danger_zone();"
         hover-content="Show Danger zone">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-alert-triangle">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
+        <div id='alert-triangle' class='icon'></div>
     </button>
     <!-- New feature button -->
     <button class="library_toolbar_item bordered" disabled="disabled" hover-content="Coming soon!"></button>
@@ -289,38 +186,22 @@
 
 <!-- Window for a list of tags -->
 <div id="library_tags" class="library_tags shadow">
-    <form class="tag_search" id="library_tags_search" method="POST" action="{{ url_for('library', tag=selected_tag,
-        pp=per_page, show_need_upd=show_need_upd) }}">
+    <form class="tag_search" id="library_tags_search" method="POST" action="{{ url_for('library') }}">
         <div class="tag_search_icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-search">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <div id='search' class='icon'></div>
         </div>
         <input class="tag_search_select" name="tag" list="tags">
         <datalist id="tags">
-            {% for tag in tags %}
-            <option value="{{tag}}">
-                {% endfor %}
+            {% for tag in tags %}<option value="{{tag}}">{% endfor %}
         </datalist>
         <button class="tag_search_submit" type="submit" hover-content="Apply">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-check">
-                <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            <div id="check" class="icon"></div>
         </button>
     </form>
     <form id="library_tags_choice" method="POST">
         {{ tags_form.tag_choices }}
         <button class="select_tag" name="select_tag" value="true" type="submit" hover-content="Apply filter">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-check">
-                <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            <div id="check" class="icon"></div>
         </button>
     </form>
 </div>
@@ -328,39 +209,21 @@
 <!-- Pagination -->
 <div class="paginator shadow rounded_block">
     {% if page_num == 1 %}
-    <div class="paginator-item bordered">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-chevron-left">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+    <div class="paginator-item bordered" :disabled>
+        <div id="chevron-left" class="icon"></div>
     </div>
     {% else %}
-    <a href="{{ url_for('library', p=page_num-1, tag=selected_tag, show_need_upd=show_need_upd) }}"
-        class="paginator-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-chevron-left">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+    <a class="paginator-item" href="{{ url_for('library', p=page_num-1) }}">
+        <div id="chevron-left" class="icon"></div>
     </a>
     {% endif %}
     {% if page_num == last_page %}
     <div class="paginator-item bordered">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-chevron-right">
-            <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        <div id="chevron-right" class="icon"></div>
     </div>
     {% else %}
-    <a href="{{ url_for('library', p=page_num+1, tag=selected_tag, show_need_upd=show_need_upd) }}"
-        class="paginator-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-chevron-right">
-            <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+    <a class="paginator-item" href="{{ url_for('library', p=page_num+1) }}">
+        <div id="chevron-right" class="icon"></div>
     </a>
     {% endif %}
 </div>
