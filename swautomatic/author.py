@@ -10,18 +10,27 @@ from bs4 import BeautifulSoup as bs
 
 from .connection import _settings
 
+__all__ = [
+    'SWAAuthor',
+]
+
 
 class SWAAuthor:
-    """## swautomatic > author > `SWAAuthor`
-        Desc.
+    """
+    swautomatic > author > `SWAAuthor`
+    ----------------------------------
+    Represents an author of asset or mod.
 
-    ### Parameters:
-        - `steamid` (integer): A Steam ID of the author.
-        - `**kwargs` (dict): The data to fill the fields of this object.
+    Parameters
+    ----------
+    -   `steam_id` (integer): A Steam ID of the author (optional).
+    -   `**kwargs` (dict): The data to fill the fields of this object.
     """
 
-    def __init__(self, steamid: int = 0, **kwargs) -> None:
+    def __init__(self, steamid: int | str = 0, **kwargs) -> None:
         # validate(kwargs, swa_author_schema)
+        if not steamid:
+            steamid = int(kwargs.pop('steam_id64', 0))
         if not steamid:
             logging.error('SteamID of the author was not received.')
         else:
@@ -34,33 +43,40 @@ class SWAAuthor:
             self.custom_url: str = data.get('custom_url', None)
 
     def to_dict(self) -> dict:
-        """### swautomatic > author > SWAAuthor.`to_dict()`
-            Coverts the object to dictionary.
+        """
+        swautomatic > author > SWAAuthor.`to_dict()`
+        --------------------------------------------
+        Coverts the object to dictionary.
 
-        #### Return
-            A dictionary (desc).
-                - `steam_id64` (int): desc;
-                - `steam_id` (str): desc;
-                - `avatar_icon` (str): desc;
-                - `avatar_medium` (str): desc;
-                - `avatar_full` (str): desc;
-                - `custom_url` (str): desc.
+        Return
+        ------
+        A dictionary which is containing:
+        - `steam_id64` (int): desc;
+        - `steam_id` (str): desc;
+        - `avatar_icon` (str): desc;
+        - `avatar_medium` (str): desc;
+        - `avatar_full` (str): desc;
+        - `custom_url` (str): desc.
         """
 
-        return {'steam_id64': self.steam_id64,
-                'steam_id': self.steam_id,
-                'avatar_icon': self.avatar_icon,
-                'avatar_medium': self.avatar_medium,
-                'avatar_full': self.avatar_full,
-                'custom_url': self.custom_url,
-                }
+        return {
+            'steam_id64': self.steam_id64,
+            'steam_id': self.steam_id,
+            'avatar_icon': self.avatar_icon,
+            'avatar_medium': self.avatar_medium,
+            'avatar_full': self.avatar_full,
+            'custom_url': self.custom_url,
+        }
 
     def get_author_data(self) -> dict:
-        """### swautomatic > author > SWAAuthor.`get_author_data()`
-            Parse the author page and returns the data in dict.
+        """
+        swautomatic > author > SWAAuthor.`get_author_data()`
+        ----------------------------------------------------
+        Parse the author page and returns the data in dict.
 
-        #### Return
-            A dictionary with a data about the author.
+        Return
+        ------
+        A dictionary with a data about the author.
         """
         soup = None
         try:

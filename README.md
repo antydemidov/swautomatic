@@ -1,14 +1,21 @@
 # Steam Workshop Automatic
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
-![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
+![Swautomatic](https://img.shields.io/badge/Swautomatic-v1.0-f08080?style=flat-square)
+![Python](https://img.shields.io/badge/python-3670A0?style=flat-square&logo=python&logoColor=ffdd54)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=?flat-square&&logo=mongodb&logoColor=white)
+![Flask](https://img.shields.io/badge/flask-%23000.svg?style=flat-square&logo=flask&logoColor=white)
+![License](https://img.shields.io/github/license/antydemidov/swautomatic?style=flat-square)
+
+![Sponsors](https://img.shields.io/github/sponsors/antydemidov?style=flat-square)
+![Last commit](https://img.shields.io/github/last-commit/antydemidov/swautomatic?style=flat-square)
+![Issues](https://img.shields.io/github/issues/antydemidov/swautomatic?style=flat-square)
+![Downloads](https://img.shields.io/github/downloads/antydemidov/swautomatic/total?style=flat-square)
 
 ## What is it?
 
 Python & Flask web-app that automatically updates mods for the game.
 
-Current version: `v0.1`
+Current version: `v1.0`
 *It may have a lot of errors. So please be careful and patient.*
 
 ## Main features
@@ -17,19 +24,32 @@ Current version: `v0.1`
 2. Checking the updates;
 3. Downloading assets and mods;
 4. Filtering assets by tags;
-5. *will be updated soon*.
+
+## Funding
+
+No one financed me except for my parents. Maybe you would also like to do it?
 
 ## Roadmap
 
-### `v0.1`
+### `v1.0`
 
-- [x] [#12](https://github.com/antydemidov/swautomatic/issues/12) Detect files from zip files and manage it. Delete extra files.
+- [x] Detect files from zip files.
+- [x] Retrieving a list of favorite assets from Steam Workshop.
+- [x] Updating the asset information in the database.
+- [x] Downloading previews and asset files.
+- [x] Removing assets.
+- [x] Filtering assets by tags and status (installed, requires update, or not installed).
+- [x] Full database update.
+- [x] Updating assets.
+- [x] Full database reset, including assets and previews.
 
 ### `v2.0`
 
 - [ ] [#13](https://github.com/antydemidov/swautomatic/issues/13) Check requirements of assets and mods.
+- [ ] [#17](https://github.com/antydemidov/swautomatic/issues/17) Add authorization via Steam.
+- [ ] [#34](https://github.com/antydemidov/swautomatic/issues/34) Supporting another games.
 
-You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
+Something else?.. You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
 
 ## Requirements
 
@@ -38,7 +58,6 @@ You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
 - python-decouple - 3.6
 - Flask - 2.2.3
 - Flask-WTF - 1.0.1
-- jsonschema - 4.17.3
 - Pillow - 9.4.0
 - pymongo - 4.3.3
 - python-decouple - 3.8
@@ -49,6 +68,6 @@ You can check the [issues](https://github.com/antydemidov/swautomatic/issues).
 
 ## Documentation [↩](docs/index.md)
 
-## License
+## License [↩](LICENSE)
 
-MIT License
+[BSD 3-Clause License](https://opensource.org/license/bsd-3-clause/)
